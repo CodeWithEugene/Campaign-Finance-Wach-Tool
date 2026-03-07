@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 
@@ -30,7 +30,7 @@ const parties: PartyFundraising[] = [
     id: 'odm', 
     name: 'Orange Democratic Movement',
     shortName: 'ODM',
-    leader: 'Raila Odinga',
+    leader: 'Oburu Odinga',
     symbol: 'Orange',
     raised: 1051992000,
     goal: 600000000,
@@ -95,9 +95,56 @@ export default function MchangoPage() {
   const [selectedParty, setSelectedParty] = useState('');
   const [amount, setAmount] = useState(100);
   const [submitting, setSubmitting] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const minAmount = 100;
   const maxAmount = 1000000;
+
+  // Infinite scroll effect
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    let animationFrameId: number;
+    let scrollPosition = 0;
+    const scrollSpeed = 0.5; // pixels per frame
+
+    const animate = () => {
+      scrollPosition += scrollSpeed;
+      
+      // Reset scroll position when we've scrolled past the first set of cards
+      const cardWidth = 320 + 24; // card width + gap
+      const totalWidth = cardWidth * parties.length;
+      
+      if (scrollPosition >= totalWidth) {
+        scrollPosition = 0;
+      }
+      
+      container.scrollLeft = scrollPosition;
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    // Start animation
+    animationFrameId = requestAnimationFrame(animate);
+
+    // Pause on hover
+    const handleMouseEnter = () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+
+    const handleMouseLeave = () => {
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    container.addEventListener('mouseenter', handleMouseEnter);
+    container.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      container.removeEventListener('mouseenter', handleMouseEnter);
+      container.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, []);
 
   const handleDonate = (partyId: string) => {
     setSelectedParty(partyId);
@@ -133,22 +180,28 @@ export default function MchangoPage() {
           Support political parties transparently. All contributions are publicly recorded and comply with Kenyan electoral law.
         </p>
 
-        {/* Party Fundraising Cards - Horizontal Scrollable Layout */}
+        {/* Party Fundraising Cards - Infinite Horizontal Scroll */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-bold text-xl">Political Parties</h2>
-            <p className="text-sm text-[var(--text-secondary)]">Scroll to see all parties →</p>
+            <p className="text-sm text-[var(--text-secondary)]">Hover to pause scrolling</p>
           </div>
           
-          <div className="overflow-x-auto pb-4 -mx-4 px-4">
+          <div 
+            ref={scrollContainerRef}
+            className="overflow-x-hidden pb-4 -mx-4 px-4"
+            style={{ scrollBehavior: 'auto' }}
+          >
             <div className="flex gap-6" style={{ minWidth: 'min-content' }}>
-              {parties.map((party) => {
+              {/* Render parties twice for seamless loop */}
+              {[...parties, ...parties].map((party, index) => {
                 const percentage = getPercentage(party.raised, party.goal);
                 
                 return (
                   <Card 
-                    key={party.id} 
-                    className="flex-shrink-0 w-80 overflow-hidden hover:shadow-xl transition-shadow"
+                    key={`${party.id}-${index}`}
+                    className="flex-shrink-0 w-80 overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+                    onClick={() => handleDonate(party.id)}
                   >
                     {/* Party Header with Logo */}
                     <div className="flex items-center gap-4 mb-4">
@@ -200,7 +253,10 @@ export default function MchangoPage() {
 
                     {/* Donate Button */}
                     <button
-                      onClick={() => handleDonate(party.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDonate(party.id);
+                      }}
                       className="w-full py-3 rounded-lg font-bold text-white transition-opacity hover:opacity-90"
                       style={{ backgroundColor: party.color }}
                     >
