@@ -113,6 +113,17 @@ npx convex dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+### Deploying to Vercel
+
+1. Push to GitHub and import the repo in [Vercel](https://vercel.com). Vercel will detect Next.js and use `npm run build` by default.
+2. **Environment variables** – In the Vercel project, go to **Settings → Environment Variables** and set at least:
+   - **`NEXTAUTH_URL`** – Your production URL (e.g. `https://your-app.vercel.app`). Required for auth and redirects.
+   - **`NEXTAUTH_SECRET`** or **`AUTH_SECRET`** – Same as local (e.g. `openssl rand -base64 32`).
+   - **`NEXT_PUBLIC_CONVEX_URL`** – Your Convex deployment URL (from [Convex Dashboard](https://dashboard.convex.dev)). The app builds without it (uses a placeholder), but map, reports, signup, and Mchango need it in production.
+   - **`ADMIN_EMAIL`** and **`ADMIN_PASSWORD_HASH`** – If you use admin login.
+   - **`PAYSTACK_SECRET_KEY`** and **`PAYSTACK_PUBLIC_KEY`** – For Mchango payments (optional).
+3. Enable the variables for **Production** (and **Preview** if you want them on PR deployments), then redeploy.
+
 ---
 
 ## Contributing
