@@ -93,8 +93,12 @@ export default function MchangoPage() {
   const pathname = usePathname();
   const locale = pathname?.split('/')[1] || 'en';
   const [selectedParty, setSelectedParty] = useState('');
-  const [amount, setAmount] = useState(100);
+  const [amount, setAmount] = useState(200);
   const [submitting, setSubmitting] = useState(false);
+  const [showDonationModal, setShowDonationModal] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const minAmount = 100;
@@ -148,12 +152,23 @@ export default function MchangoPage() {
 
   const handleDonate = (partyId: string) => {
     setSelectedParty(partyId);
+    setShowDonationModal(true);
+  };
+
+  const handleSubmitDonation = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phoneNumber || (!fullName && !isAnonymous)) return;
+    
     setSubmitting(true);
-    // In production, integrate Paystack here
+    // In production, integrate M-Pesa/Paystack here
     // For now, simulate success
     setTimeout(() => {
-      router.push(`/${locale}/mchango/success?amount=${amount}&party=${partyId}`);
+      router.push(`/${locale}/mchango/success?amount=${amount}&party=${selectedParty}&phone=${phoneNumber}`);
     }, 1500);
+  };
+
+  const getSelectedParty = () => {
+    return parties.find(p => p.id === selectedParty);
   };
 
   const getPercentage = (raised: number, goal: number) => {
@@ -258,6 +273,131 @@ export default function MchangoPage() {
             </div>
           </div>
         </div>
+
+        {/* Donation Modal */}
+        {showDonationModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+              <Card>
+                {/* Modal Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="font-bold text-2xl" style={{ color: getSelectedParty()?.color }}>
+                      KES {amount.toLocaleString()} M-Pesa Donation
+                    </h2>
+                    <p className="text-sm text-[var(--text-secondary)] mt-1">
+                      Donating to {getSelectedParty()?.shortName}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowDonationModal(false)}
+                    className="text-gray-400 hover:text-gray-600 text-2xl"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                {/* Instructions */}
+                <div className="mb-6 space-y-2 text-sm text-gray-600">
+                  <p>• Fill the form below, Click Donate</p>
+                  <p>• Enter M-Pesa PIN when prompted on your phone</p>
+                  <p>• You'll receive receipts from M-Pesa, and M-Changa</p>
+                </div>
+
+                {/* Donation Form */}
+                <form onSubmit={handleSubmitDonation} className="space-y-6">
+                  {/* Amount */}
+                  <div>
+                    <label className="block mb-2 font-medium text-gray-700">
+                      Amount (KES) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      value={amount}
+                      onChange={(e) => setAmount(Number(e.target.value))}
+                      min={minAmount}
+                      max={maxAmount}
+                      required
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                      placeholder="Enter amount"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Min: KES {minAmount.toLocaleString()} — Max: KES {maxAmount.toLocaleString()}
+                    </p>
+                  </div>
+
+                  {/* M-Pesa Phone Number */}
+                  <div>
+                    <label className="block mb-2 font-medium text-gray-700">
+                      M-Pesa Phone Number <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      required
+                      pattern="[0-9]{10}"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                      placeholder="Enter a valid M-Pesa Phone Number"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Format: 0712345678 (10 digits)
+                    </p>
+                  </div>
+
+                  {/* Full Name */}
+                  <div>
+                    <label className="block mb-2 font-medium text-gray-700">
+                      Full Name {!isAnonymous && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required={!isAnonymous}
+                      disabled={isAnonymous}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      placeholder="Enter your name"
+                    />
+                  </div>
+
+                  {/* Anonymous Checkbox */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="anonymous"
+                      checked={isAnonymous}
+                      onChange={(e) => {
+                        setIsAnonymous(e.target.checked);
+                        if (e.target.checked) setFullName('');
+                      }}
+                      className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-200"
+                    />
+                    <label htmlFor="anonymous" className="text-sm text-gray-700 cursor-pointer">
+                      Anonymous
+                    </label>
+                  </div>
+
+                  {/* Legal Notice */}
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs text-gray-600">
+                    <p className="font-semibold mb-1">Legal Compliance:</p>
+                    <p>All contributions are publicly recorded and must comply with Kenyan campaign finance laws. No foreign donations accepted.</p>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full py-4 rounded-lg font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                    style={{ backgroundColor: getSelectedParty()?.color }}
+                  >
+                    {submitting ? 'Processing...' : `Donate KES ${amount.toLocaleString()} via M-Pesa`}
+                  </button>
+                </form>
+              </Card>
+            </div>
+          </div>
+        )}
 
         {/* Legal Compliance Notice */}
         <div className="max-w-4xl mx-auto">
