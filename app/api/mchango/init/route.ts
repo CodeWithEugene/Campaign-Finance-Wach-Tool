@@ -2,10 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/convex/_generated/api';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
 export async function POST(request: NextRequest) {
+  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
+  if (!convexUrl) {
+    return NextResponse.json({ error: 'Service not configured' }, { status: 503 });
+  }
+
   try {
+    const convex = new ConvexHttpClient(convexUrl);
     const body = await request.json();
     const { amount, partyId, partyName, email, locale } = body as {
       amount: number;

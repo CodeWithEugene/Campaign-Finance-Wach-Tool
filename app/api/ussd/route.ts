@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/convex/_generated/api';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
 const categoryMap: Record<string, 'vote-buying' | 'illegal-donations' | 'misuse-public-resources' | 'undeclared-spending' | 'bribery' | 'other'> = {
   '1': 'vote-buying',
   '2': 'illegal-donations',
@@ -45,25 +43,31 @@ export async function POST(request: NextRequest) {
     } else if (parts.length === 5) {
       const confirm = parts[4];
       if (confirm === '1') {
-        const categoryKey = parts[1];
-        const description = (parts[2] || '').slice(0, 500);
-        const location = (parts[3] || '').slice(0, 200);
-        const category = categoryMap[categoryKey] || 'other';
-        const title = description.slice(0, 80) || 'USSD Report';
-        try {
-          const reportId = await convex.mutation(api.reports.create, {
-            title,
-            description: description || 'No description provided.',
-            category,
-            location: location || 'Not specified',
-            county: location || undefined,
-            anonymous: true,
-            source: 'ussd',
-          });
-          response = `END Thank you. Report ID: ${reportId}. We will review it.`;
-        } catch (e) {
-          console.error('USSD Convex create error:', e);
-          response = 'END Sorry, we could not save your report. Please try again later.';
+        const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
+        if (!convexUrl) {
+          response = 'END Service unavailable. Please try again later.';
+        } else {
+          const convex = new ConvexHttpClient(convexUrl);
+          const categoryKey = parts[1];
+          const description = (parts[2] || '').slice(0, 500);
+          const location = (parts[3] || '').slice(0, 200);
+          const category = categoryMap[categoryKey] || 'other';
+          const title = description.slice(0, 80) || 'USSD Report';
+          try {
+            const reportId = await convex.mutation(api.reports.create, {
+              title,
+              description: description || 'No description provided.',
+              category,
+              location: location || 'Not specified',
+              county: location || undefined,
+              anonymous: true,
+              source: 'ussd',
+            });
+            response = `END Thank you. Report ID: ${reportId}. We will review it.`;
+          } catch (e) {
+            console.error('USSD Convex create error:', e);
+            response = 'END Sorry, we could not save your report. Please try again later.';
+          }
         }
       } else {
         response = 'END Report cancelled.';

@@ -2,9 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/convex/_generated/api';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
 export async function GET(request: NextRequest) {
+  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
+  if (!convexUrl) {
+    return NextResponse.json({ error: 'Export not configured' }, { status: 503 });
+  }
+
   const searchParams = request.nextUrl.searchParams;
   const format = searchParams.get('format') || 'csv';
   const status = searchParams.get('status') || undefined;
@@ -12,6 +15,7 @@ export async function GET(request: NextRequest) {
   const county = searchParams.get('county') || undefined;
 
   try {
+    const convex = new ConvexHttpClient(convexUrl);
     const reports = await convex.query(api.reports.list, {
       status: status as 'submitted' | 'under_review' | 'verified' | 'unverified' | 'needs_more_info' | undefined,
       category: category as

@@ -2,10 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/convex/_generated/api';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
 export async function GET() {
+  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
+  if (!convexUrl) {
+    return NextResponse.json({ error: 'Press kit not configured' }, { status: 503 });
+  }
+
   try {
+    const convex = new ConvexHttpClient(convexUrl);
     const [reports, stats] = await Promise.all([
       convex.query(api.reports.list, { limit: 100 }),
       convex.query(api.reports.dashboardStats),

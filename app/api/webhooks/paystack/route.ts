@@ -3,10 +3,14 @@ import crypto from 'crypto';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/convex/_generated/api';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
 export async function POST(request: NextRequest) {
+  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
+  if (!convexUrl) {
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
+  }
+
   try {
+    const convex = new ConvexHttpClient(convexUrl);
     const body = await request.text();
     const signature = request.headers.get('x-paystack-signature');
     const secret = process.env.PAYSTACK_SECRET_KEY;
