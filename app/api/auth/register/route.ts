@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/convex/_generated/api';
+import { validatePassword } from '@/lib/password';
 
 export async function POST(request: Request) {
   try {
@@ -16,9 +17,11 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    if (password.length < 8) {
+
+    const pwValidation = validatePassword(password);
+    if (!pwValidation.valid) {
       return NextResponse.json(
-        { error: 'Password must be at least 8 characters' },
+        { error: pwValidation.error },
         { status: 400 }
       );
     }

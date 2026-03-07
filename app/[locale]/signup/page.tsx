@@ -5,6 +5,7 @@ import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
+import { validatePassword } from '@/lib/password';
 
 function SignupForm() {
   const pathname = usePathname();
@@ -18,9 +19,15 @@ function SignupForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const pwValidation = validatePassword(password);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    if (!pwValidation.valid) {
+      setError(pwValidation.error ?? 'Password does not meet requirements.');
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch('/api/auth/register', {
@@ -85,13 +92,33 @@ function SignupForm() {
                 required
                 minLength={8}
                 className="w-full px-4 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)]"
+                aria-describedby="password-requirements"
               />
-              <p className="text-xs text-[var(--text-secondary)] mt-1">At least 8 characters</p>
+              <p id="password-requirements" className="text-xs text-[var(--text-secondary)] mt-1 mb-1">
+                Must include:
+              </p>
+              <ul className="text-xs text-[var(--text-secondary)] list-disc list-inside space-y-0.5">
+                <li className={pwValidation.checks.minLength ? 'text-green-600 dark:text-green-400' : ''}>
+                  At least 8 characters{pwValidation.checks.minLength ? ' ✓' : ''}
+                </li>
+                <li className={pwValidation.checks.uppercase ? 'text-green-600 dark:text-green-400' : ''}>
+                  One uppercase letter{pwValidation.checks.uppercase ? ' ✓' : ''}
+                </li>
+                <li className={pwValidation.checks.lowercase ? 'text-green-600 dark:text-green-400' : ''}>
+                  One lowercase letter{pwValidation.checks.lowercase ? ' ✓' : ''}
+                </li>
+                <li className={pwValidation.checks.number ? 'text-green-600 dark:text-green-400' : ''}>
+                  One number{pwValidation.checks.number ? ' ✓' : ''}
+                </li>
+                <li className={pwValidation.checks.special ? 'text-green-600 dark:text-green-400' : ''}>
+                  One special character (!@#$%^&* etc.){pwValidation.checks.special ? ' ✓' : ''}
+                </li>
+              </ul>
             </div>
             {error && <p className="text-sm text-[var(--accent-2)]">{error}</p>}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !pwValidation.valid}
               className="w-full py-3 bg-[var(--accent-1)] text-white font-bold rounded-lg disabled:opacity-50"
             >
               {loading ? 'Creating account...' : 'Sign up'}

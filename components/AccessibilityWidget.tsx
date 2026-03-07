@@ -115,7 +115,7 @@ function applyPreferences(prefs: {
 function AccessibilityButtonIcon({ className }: { className?: string }) {
   return (
     <img
-      src="images/accessibility/accessibility-icon.png"
+      src="/images/accessibility/accessibility-icon.png"
       alt=""
       className={className}
       width={28}
