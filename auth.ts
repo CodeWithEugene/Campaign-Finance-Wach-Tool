@@ -20,13 +20,12 @@ export const authOptions: NextAuthOptions = {
         // 1. Try admin (env-based)
         const adminEmail = process.env.ADMIN_EMAIL;
         const adminHash = process.env.ADMIN_PASSWORD_HASH;
-        if (adminEmail && adminHash && email === adminEmail) {
+        if (adminEmail && adminHash && email.toLowerCase() === adminEmail.toLowerCase()) {
           try {
             const ok = await bcrypt.compare(password, adminHash);
             if (ok) return { id: 'admin', email: adminEmail, name: 'Admin', role: 'admin' };
           } catch (err) {
-            // Invalid hash format — log for debugging and treat as failed login
-            console.error('[auth] Admin bcrypt compare failed (check ADMIN_PASSWORD_HASH format):', err);
+            console.error('[auth] Admin bcrypt compare failed (check ADMIN_PASSWORD_HASH is a valid bcrypt hash):', err);
           }
         }
 
@@ -40,7 +39,6 @@ export const authOptions: NextAuthOptions = {
             const user = await client.action(api.auth.verifyUser, { email, password });
             if (user) return { id: user.id, email: user.email, name: user.name ?? 'User', role: 'user' };
           } catch (err) {
-            // Log the real error so failures can be diagnosed (e.g. network outage, bad Convex URL)
             console.error('[auth] Convex verifyUser failed:', err);
           }
         }
@@ -58,12 +56,13 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  // signIn page is locale-aware: read from env or fall back to /en/login.
-  // Set NEXTAUTH_SIGNIN_LOCALE in your .env to override (e.g. "sw" for Swahili).
   pages: {
     signIn: `/${process.env.NEXTAUTH_SIGNIN_LOCALE ?? 'en'}/login`,
   },
-  session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 }, // 30 days
+  // Do NOT set NEXTAUTH_URL in this file — Next-auth auto-detects the URL from the
+  // request in production (Vercel sets NEXTAUTH_URL automatically via VERCEL_URL).
+  // Only set NEXTAUTH_URL in .env for local dev (http://localhost:3000).
+  session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 },
 };
 
 export function auth() {
