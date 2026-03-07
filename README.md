@@ -129,7 +129,8 @@ Open [http://localhost:3000](http://localhost:3000).
 2. **Environment variables** – In the Vercel project, go to **Settings → Environment Variables** and set at least:
    - **`NEXTAUTH_URL`** – Your production URL (e.g. `https://your-app.vercel.app`). Required for auth and redirects.
    - **`NEXTAUTH_SECRET`** or **`AUTH_SECRET`** – Same as local (e.g. `openssl rand -base64 32`).
-   - **`NEXT_PUBLIC_CONVEX_URL`** – Your Convex deployment URL (from [Convex Dashboard](https://dashboard.convex.dev)). The app builds without it (uses a placeholder), but map, reports, signup, and Mchango need it in production.
+   - **`CONVEX_URL`** – Your Convex deployment URL (same as below). **Required for login** so the server can verify credentials.
+   - **`NEXT_PUBLIC_CONVEX_URL`** – Same Convex URL (for map, reports, signup). The app builds without it (uses a placeholder), but map, reports, signup, and Mchango need it in production.
    - Admin login uses the Convex **admins** table; run `npx convex run admins:seedDefaultAdmin` once if you use admin login.
    - **`PAYSTACK_SECRET_KEY`** and **`PAYSTACK_PUBLIC_KEY`** – For Mchango payments (optional).
 3. Enable the variables for **Production** (and **Preview** if you want them on PR deployments), then redeploy.

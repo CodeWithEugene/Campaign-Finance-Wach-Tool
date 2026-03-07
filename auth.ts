@@ -16,7 +16,8 @@ export const authOptions: NextAuthOptions = {
         const password = (credentials?.password as string) || '';
         if (!email || !password) return null;
 
-        const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
+        // Prefer CONVEX_URL (server-only) so auth always uses the deployment you deployed to.
+        const convexUrl = process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL;
         if (!convexUrl) return null;
 
         try {
