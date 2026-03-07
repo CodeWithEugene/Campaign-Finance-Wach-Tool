@@ -18,8 +18,8 @@ export const authOptions: NextAuthOptions = {
         if (!email || !password) return null;
 
         // 1. Try admin (env-based)
-        const adminEmail = process.env.ADMIN_EMAIL;
-        const adminHash = process.env.ADMIN_PASSWORD_HASH;
+        const adminEmail = process.env.ADMIN_EMAIL?.trim();
+        const adminHash = process.env.ADMIN_PASSWORD_HASH?.trim();
         if (adminEmail && adminHash && email.toLowerCase() === adminEmail.toLowerCase()) {
           try {
             const ok = await bcrypt.compare(password, adminHash);

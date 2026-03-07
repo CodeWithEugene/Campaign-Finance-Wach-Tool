@@ -86,9 +86,23 @@ cp .env.example .env
 | `NEXTAUTH_URL` | App URL (e.g. `http://localhost:3000`) |
 | `NEXTAUTH_SECRET` | Random string (e.g. `openssl rand -base64 32`) |
 | `ADMIN_EMAIL` | Admin login email |
-| `ADMIN_PASSWORD_HASH` | bcrypt hash of admin password: `node -e "console.log(require('bcryptjs').hashSync('YOUR_PASSWORD', 10))"` |
+| `ADMIN_PASSWORD_HASH` | bcrypt hash of admin password (see Admin login below) |
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for Africa's Talking and other optional variables.
+
+### Admin login
+
+Admin sign-in is at **`/{locale}/admin/login`** (e.g. [http://localhost:3000/en/admin/login](http://localhost:3000/en/admin/login)). It uses `ADMIN_EMAIL` and `ADMIN_PASSWORD_HASH` from your env.
+
+1. **Set `ADMIN_EMAIL`** to the admin email (e.g. `admin@cfwt.com`).
+2. **Set `ADMIN_PASSWORD_HASH`** to a **bcrypt hash** of the password, **not** the plain password.
+   - Generate a hash:  
+     `node -e "console.log(require('bcryptjs').hashSync('YOUR_PASSWORD', 10))"`
+   - In `.env`, **wrap the hash in single quotes** so the `$` in the hash is not expanded:  
+     `ADMIN_PASSWORD_HASH='$2a$10$...'`
+   - Example from the repo: email `admin@cfwt.com`, password `Admin123!` (use the hash from `.env.example`).
+3. Restart the dev server after changing `.env`.
+4. On **Vercel**, add both `ADMIN_EMAIL` and `ADMIN_PASSWORD_HASH` in Project → Settings → Environment Variables (and quote the hash there too if the UI allows).
 
 ### Convex setup
 
