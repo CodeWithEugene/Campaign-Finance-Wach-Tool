@@ -10,6 +10,7 @@ import { MobileNav } from './MobileNav';
 
 const navLinks = [
   { href: '/learn', label: 'Learn' },
+  { href: '/intelligence', label: 'Intelligence' },
   { href: '/report', label: 'Report' },
   { href: '/mchango', label: 'Mchango' },
   { href: '/map', label: 'Map' },

@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "learn": "Jifunze",
+    "intelligence": "Ujumbe",
+    "report": "Ripoti",
+    "map": "Ramani",
+    "reports": "Ripoti",
+    "transparency": "Uwazi",
+    "calculator": "Kikokotoo",
+    "parties": "Vyama",
+    "counties": "Kaunti",
+    "trends": "Mwelekeo",
+    "press": "Kifurushi cha Waandishi"
+  },
+  "home": {
+    "title": "Kifaa cha Uangalizi wa Ufadhili wa Kampeni",
+    "subtitle": "Fuatilia ufadhili wa kisiasa, onyesha data ya ufadhili wa kampeni, na uangalie matumizi mabaya ya rasilimali za umma nchini Kenya.",
+    "report": "Wasilisha Ripoti",
+    "learn": "Jifunze Zaidi"
+  },
+  "report": {
+    "title": "Wasilisha Ripoti",
+    "category": "Aina",
+    "selectCategory": "Chagua aina ya ripoti",
+    "title_field": "Kichwa",
+    "description": "Maelezo",
+    "descriptionPlaceholder": "Eleza ulichoona (angalau herufi 20)",
+    "county": "Kaunti",
+    "selectCounty": "Chagua kaunti",
+    "location": "Mahali Mahususi",
+    "locationPlaceholder": "Mji, jimbo, au alama",
+    "incidentDate": "Tarehe ya Tukio",
+    "evidence": "Ushahidi",
+    "uploadImages": "Pakia picha (juu ya 5, 5MB kila moja)",
+    "anonymous": "Wasilisha bila kujitambulisha",
+    "email": "Barua pepe (si lazima, kwa ufuatiliaji)",
+    "disclaimer": "Hatuwezi kuhakikisha kutokujulikana katika hali zote, kama vile kujibu wito wa kisheria. Tumia hukumu yako unapowasilisha taarifa nyeti.",
+    "submit": "Wasilisha Ripoti",
+    "submitting": "Inawasilisha...",
+    "success": "Ripoti imewasilishwa",
+    "error": "Imeshindwa kuwasilisha ripoti"
+  },
+  "categories": {
+    "vote-buying": "Kununua Kura",
+    "illegal-donations": "Michango Haramu",
+    "public-resource-misuse": "Matumizi Mabaya ya Rasilimali za Umma",
+    "undeclared-spending": "Matumizi Yasiyotangazwa",
+    "bribery": "Rushwa kwa Maafisa",
+    "other": "Nyingine"
+  },
+  "status": {
+    "submitted": "Imewasilishwa",
+    "under-review": "Inakaguliwa",
+    "verified": "Imethibitishwa",
+    "unverified": "Haijathibitishwa",
+    "needs-more-info": "Inahitaji Taarifa Zaidi"
+  },
+  "learn": {
+    "title": "Jifunze Kuhusu Ufadhili wa Kampeni",
+    "ppf": "Mfuko wa Vyama vya Siasa",
+    "spendingLimits": "Vikomo vya Matumizi",
+    "faq": "Maswali Yanayoulizwa Mara kwa Mara",
+    "glossary": "Kamusi ya Kisheria"
+  },
+  "transparency": {
+    "title": "Kipimo cha Uwazi",
+    "score": "Alama ya Uwazi",
+    "grade": "Daraja",
+    "methodology": "Mbinu"
+  }
+}

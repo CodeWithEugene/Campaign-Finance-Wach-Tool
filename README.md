@@ -29,6 +29,7 @@ The Campaign Finance Watch Tool empowers Kenyan citizens to:
 | Feature | Description |
 |---------|-------------|
 | **Information & Education** | Explains campaign funding, PPF formula, legal limits, and spending rules |
+| **Political Intelligence** | Search any party or politician to view comprehensive intelligence from public sources |
 | **Mchango** | Crowdfunding via Paystack (M-Pesa, cards) to support parties/candidates |
 | **Public Reporting** | Upload evidence (photos, videos) of campaign finance misuse |
 | **Report Categorization** | Vote buying, illegal donations, misuse of public resources, etc. |
@@ -46,10 +47,16 @@ See [FEATURES.md](./FEATURES.md) for the full specification.
 
 ## Tech Stack
 
-- **Framework:** Next.js (Vercel)
-- **Payments:** Paystack
-- **USSD/SMS:** Africa's Talking
+- **Framework:** Next.js 14 (App Router) + TypeScript
+- **Backend:** Firebase (Firestore, Auth, Storage, Functions)
+- **Payments:** Paystack (M-Pesa integration)
+- **SMS/USSD:** Africa's Talking
+- **Email:** Resend
+- **Maps:** Leaflet.js + OpenStreetMap
+- **Charts:** Recharts
+- **Styling:** Tailwind CSS + shadcn/ui
 - **Deployment:** Vercel
+- **i18n:** next-intl (English + Swahili)
 
 ---
 
@@ -73,15 +80,40 @@ npm install
 Copy the example env and add your keys:
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
 | Variable | Description |
 |----------|-------------|
-| `PAYSTACK_SECRET_KEY` | Paystack secret key |
-| `PAYSTACK_PUBLIC_KEY` | Paystack public key |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase Web API key |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Firebase project ID |
+| `FIREBASE_ADMIN_PRIVATE_KEY` | Firebase Admin SDK private key |
+| `AT_API_KEY` | Africa's Talking API key |
+| `RESEND_API_KEY` | Resend email API key |
+| `HASH_SALT` | Security salt for hashing (generate with `openssl rand -base64 32`) |
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for Africa's Talking and other optional variables.
+**Quick Setup:** See [QUICKSTART.md](./QUICKSTART.md) for step-by-step Firebase configuration.
+
+### Firebase Setup
+
+1. Get Firebase Admin credentials from [Console](https://console.firebase.google.com/project/fedhawatch-318a8/settings/serviceaccounts/adminsdk)
+2. Enable Firestore, Authentication, and Storage
+3. Deploy security rules:
+
+```bash
+firebase login
+firebase init
+firebase deploy --only firestore:rules
+firebase deploy --only firestore:indexes
+firebase deploy --only storage
+```
+
+4. Seed initial data:
+
+```bash
+npm run seed:parties
+npm run seed:ppf
+```
 
 ### Run Locally
 
@@ -121,5 +153,20 @@ This project is licensed under the MIT License — see [LICENSE](./LICENSE) for 
 ## Links
 
 - [Live App](https://campaign-finance-wach-tool.vercel.app/)
+- [Firebase Console](https://console.firebase.google.com/project/fedhawatch-318a8)
+- [Quick Start Guide](./QUICKSTART.md)
+- [Setup Guide](./SETUP.md)
+- [Implementation Guide](./IMPLEMENTATION_GUIDE.md)
+- [Deployment Checklist](./DEPLOYMENT.md)
 - [Feature Specification](./FEATURES.md)
 - [Contributing Guide](./CONTRIBUTING.md)
+
+---
+
+## Project Status
+
+✅ **Phase 1 Complete:** Firebase infrastructure, API routes, security rules  
+🚧 **Phase 2 In Progress:** UI components, report submission form  
+📅 **Phase 3 Planned:** Admin dashboard, email alerts, transparency index  
+
+**Target Launch:** Q2 2026 | **Election Target:** August 2027

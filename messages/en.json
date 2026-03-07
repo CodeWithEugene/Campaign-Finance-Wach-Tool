@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "learn": "Learn",
+    "intelligence": "Intelligence",
+    "report": "Report",
+    "map": "Map",
+    "reports": "Reports",
+    "transparency": "Transparency",
+    "calculator": "Calculator",
+    "parties": "Parties",
+    "counties": "Counties",
+    "trends": "Trends",
+    "press": "Press Kit"
+  },
+  "home": {
+    "title": "Campaign Finance Watch Tool",
+    "subtitle": "Track political financing, visualize campaign finance data, and monitor alleged misuse of public resources in Kenya.",
+    "report": "Submit Report",
+    "learn": "Learn More"
+  },
+  "report": {
+    "title": "Submit a Report",
+    "category": "Category",
+    "selectCategory": "Select report category",
+    "title_field": "Title",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe what you observed (minimum 20 characters)",
+    "county": "County",
+    "selectCounty": "Select county",
+    "location": "Specific Location",
+    "locationPlaceholder": "Town, constituency, or landmark",
+    "incidentDate": "Incident Date",
+    "evidence": "Evidence",
+    "uploadImages": "Upload images (max 5, 5MB each)",
+    "anonymous": "Submit anonymously",
+    "email": "Email (optional, for follow-up)",
+    "disclaimer": "We cannot guarantee anonymity in all circumstances, such as in response to a legal subpoena. Use your judgment when submitting sensitive information.",
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "success": "Report submitted successfully",
+    "error": "Failed to submit report"
+  },
+  "categories": {
+    "vote-buying": "Vote Buying",
+    "illegal-donations": "Alleged Illegal Donations",
+    "public-resource-misuse": "Alleged Misuse of Public Resources",
+    "undeclared-spending": "Undeclared Spending",
+    "bribery": "Alleged Bribery of Officials",
+    "other": "Other"
+  },
+  "status": {
+    "submitted": "Submitted",
+    "under-review": "Under Review",
+    "verified": "Verified",
+    "unverified": "Unverified",
+    "needs-more-info": "Needs More Info"
+  },
+  "learn": {
+    "title": "Learn About Campaign Finance",
+    "ppf": "Political Parties Fund",
+    "spendingLimits": "Spending Limits",
+    "faq": "Frequently Asked Questions",
+    "glossary": "Legal Glossary"
+  },
+  "transparency": {
+    "title": "Transparency Index",
+    "score": "Transparency Score",
+    "grade": "Grade",
+    "methodology": "Methodology"
+  }
+}

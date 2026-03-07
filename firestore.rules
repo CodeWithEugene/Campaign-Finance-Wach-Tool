@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Public read on parties, candidates, ppfAllocations, transparencyScores
+    match /parties/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /ppfAllocations/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /candidates/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /transparencyScores/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Reports — public can read verified/under-review but not internal notes
+    match /reports/{reportId} {
+      allow read: if resource.data.status != "submitted" || isReviewer();
+      allow create: if true;  // anyone can submit
+      allow update: if isReviewer();
+      
+      // Reviews subcollection — admin only
+      match /reviews/{reviewId} {
+        allow read: if isReviewer();
+        allow create: if isReviewer();
+        allow update: if false;  // immutable audit log
+        allow delete: if false;
+      }
+      
+      // Links subcollection — admin only
+      match /links/{linkId} {
+        allow read: if isReviewer();
+        allow write: if isReviewer();
+      }
+    }
+    
+    // Alert subscriptions — only own data
+    match /alertSubscriptions/{id} {
+      allow read, write: if true;  // server-side handles validation
+    }
+    
+    // SMS subscriptions
+    match /smsSubscriptions/{id} {
+      allow read: if isReviewer();
+      allow write: if false;  // server-side only
+    }
+    
+    // USSD sessions — server-side only
+    match /ussdSessions/{id} {
+      allow read, write: if false;  // Firebase Functions only
+    }
+    
+    // Intelligence Module Collections
+    
+    // Person intelligence — public read, server-side write
+    match /personIntelligence/{personId} {
+      allow read: if true;  // public data from public sources
+      allow write: if false;  // only API routes can write
+    }
+    
+    // Party intelligence — public read, server-side write
+    match /partyIntelligence/{partyId} {
+      allow read: if true;  // public data from public sources
+      allow write: if false;  // only API routes can write
+    }
+    
+    // Search cache — public read, server-side write
+    match /searchCache/{queryHash} {
+      allow read: if true;
+      allow write: if false;  // only API routes can write
+    }
+    
+    // Admin users collection
+    match /adminUsers/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if isAdmin();
+    }
+    
+    function isAdmin() {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function isReviewer() {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.role in ['reviewer', 'admin'];
+    }
+  }
+}
