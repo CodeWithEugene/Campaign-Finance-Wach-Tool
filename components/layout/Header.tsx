@@ -12,6 +12,7 @@ import { getMessage } from '@/lib/i18n';
 
 const navLinkKeys = [
   { href: '/learn', key: 'nav.learn' },
+  { href: '/intelligence', key: 'nav.intelligence' },
   { href: '/report', key: 'nav.report' },
   { href: '/mchango', key: 'nav.mchango' },
   { href: '/map', key: 'nav.map' },

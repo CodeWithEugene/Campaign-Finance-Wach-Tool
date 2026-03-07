@@ -118,6 +118,16 @@ function SignupForm() {
               </ul>
             </div>
             {error && <p className="text-sm text-[var(--accent-2)]">{error}</p>}
+            <p className="text-xs text-[var(--text-secondary)]">
+              By signing up, you agree to our{' '}
+              <Link
+                href={`/${locale}/terms`}
+                className="text-[var(--accent-1)] font-medium hover:underline"
+              >
+                terms and conditions about data privacy
+              </Link>
+              .
+            </p>
             <button
               type="submit"
               disabled={loading || !pwValidation.valid}

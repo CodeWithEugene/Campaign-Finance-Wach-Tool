@@ -43,6 +43,7 @@ const footerSections: { sectionKey: string; links: { href: string; labelKey: str
   {
     sectionKey: 'footer.sectionLegal',
     links: [
+      { href: '/terms', labelKey: 'footer.terms' },
       { href: '/privacy', labelKey: 'footer.privacy' },
       { href: '/about', labelKey: 'footer.about' },
       { href: '/contact', labelKey: 'footer.contact' },

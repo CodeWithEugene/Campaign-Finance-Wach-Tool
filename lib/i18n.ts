@@ -5,6 +5,7 @@
 export const messages: Record<string, Record<string, string>> = {
   en: {
     'nav.learn': 'Learn',
+    'nav.intelligence': 'Intelligence',
     'nav.report': 'Report',
     'nav.mchango': 'Mchango',
     'nav.map': 'Map',
@@ -44,6 +45,7 @@ export const messages: Record<string, Record<string, string>> = {
     'footer.apiDocs': 'API docs',
     'footer.dataSources': 'Data Sources',
     'footer.newsletter': 'Newsletter',
+    'footer.terms': 'Terms & Data Privacy',
     'footer.privacy': 'Privacy Policy',
     'footer.about': 'About',
     'footer.contact': 'Contact',
@@ -53,6 +55,7 @@ export const messages: Record<string, Record<string, string>> = {
   },
   sw: {
     'nav.learn': 'Jifunze',
+    'nav.intelligence': 'Ujasusi',
     'nav.report': 'Ripoti',
     'nav.mchango': 'Mchango',
     'nav.map': 'Ramani',
@@ -92,6 +95,7 @@ export const messages: Record<string, Record<string, string>> = {
     'footer.apiDocs': 'API docs',
     'footer.dataSources': 'Vyanzo vya Data',
     'footer.newsletter': 'Barua pepe',
+    'footer.terms': 'Masharti na Faragha',
     'footer.privacy': 'Sera ya Faragha',
     'footer.about': 'Kuhusu',
     'footer.contact': 'Wasiliana',
@@ -102,6 +106,7 @@ export const messages: Record<string, Record<string, string>> = {
   // Kikuyu (Gĩkũyũ)
   ki: {
     'nav.learn': 'Ĩgĩ',
+    'nav.intelligence': 'Intelligence',
     'nav.report': 'Rĩtia',
     'nav.mchango': 'Mchango',
     'nav.map': 'Mũborari',
@@ -141,6 +146,7 @@ export const messages: Record<string, Record<string, string>> = {
     'footer.apiDocs': 'API docs',
     'footer.dataSources': 'Vyanzo vya Data',
     'footer.newsletter': 'Newsletter',
+    'footer.terms': 'Terms & Data Privacy',
     'footer.privacy': 'Sera ya Faragha',
     'footer.about': 'Kũhũ',
     'footer.contact': 'Wasiliana',
@@ -151,6 +157,7 @@ export const messages: Record<string, Record<string, string>> = {
   // Kamba
   kam: {
     'nav.learn': 'Ĩvinda',
+    'nav.intelligence': 'Intelligence',
     'nav.report': 'Laulika',
     'nav.mchango': 'Mchango',
     'nav.map': 'Mũbora',
@@ -190,6 +197,7 @@ export const messages: Record<string, Record<string, string>> = {
     'footer.apiDocs': 'API docs',
     'footer.dataSources': 'Vyanzo vya Data',
     'footer.newsletter': 'Newsletter',
+    'footer.terms': 'Terms & Data Privacy',
     'footer.privacy': 'Sera ya Faragha',
     'footer.about': 'Kũhũ',
     'footer.contact': 'Wasiliana',
@@ -200,6 +208,7 @@ export const messages: Record<string, Record<string, string>> = {
   // Dholuo (Luo)
   luo: {
     'nav.learn': 'Puonj',
+    'nav.intelligence': 'Intelligence',
     'nav.report': 'Pak',
     'nav.mchango': 'Mchango',
     'nav.map': 'Map',
@@ -239,6 +248,7 @@ export const messages: Record<string, Record<string, string>> = {
     'footer.apiDocs': 'API docs',
     'footer.dataSources': 'Data Sources',
     'footer.newsletter': 'Newsletter',
+    'footer.terms': 'Terms & Data Privacy',
     'footer.privacy': 'Privacy Policy',
     'footer.about': 'About',
     'footer.contact': 'Contact',
@@ -249,6 +259,7 @@ export const messages: Record<string, Record<string, string>> = {
   // Luhya (Oluluhya)
   luy: {
     'nav.learn': 'Soma',
+    'nav.intelligence': 'Intelligence',
     'nav.report': 'Lola',
     'nav.mchango': 'Mchango',
     'nav.map': 'Mapu',
@@ -288,6 +299,7 @@ export const messages: Record<string, Record<string, string>> = {
     'footer.apiDocs': 'API docs',
     'footer.dataSources': 'Data Sources',
     'footer.newsletter': 'Newsletter',
+    'footer.terms': 'Terms & Data Privacy',
     'footer.privacy': 'Privacy Policy',
     'footer.about': 'About',
     'footer.contact': 'Contact',
@@ -298,6 +310,7 @@ export const messages: Record<string, Record<string, string>> = {
   // Kalenjin
   kln: {
     'nav.learn': 'Kigai',
+    'nav.intelligence': 'Intelligence',
     'nav.report': 'Koruut',
     'nav.mchango': 'Mchango',
     'nav.map': 'Map',
@@ -337,6 +350,7 @@ export const messages: Record<string, Record<string, string>> = {
     'footer.apiDocs': 'API docs',
     'footer.dataSources': 'Data Sources',
     'footer.newsletter': 'Newsletter',
+    'footer.terms': 'Terms & Data Privacy',
     'footer.privacy': 'Privacy Policy',
     'footer.about': 'About',
     'footer.contact': 'Contact',
