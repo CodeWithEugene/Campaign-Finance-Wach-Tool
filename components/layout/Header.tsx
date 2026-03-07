@@ -49,13 +49,6 @@ export function Header() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          <Link
-            href={`/${locale}`}
-            className="font-display font-black text-xl lg:text-2xl text-[var(--accent-1)] hover:text-[var(--accent-2)] transition-colors"
-          >
-            CFWT
-          </Link>
-
           <form
             onSubmit={handleSearch}
             className="hidden md:flex flex-1 max-w-xs mx-4"
