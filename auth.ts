@@ -21,8 +21,12 @@ export const authOptions: NextAuthOptions = {
         const adminEmail = process.env.ADMIN_EMAIL;
         const adminHash = process.env.ADMIN_PASSWORD_HASH;
         if (adminEmail && adminHash && email === adminEmail) {
-          const ok = await bcrypt.compare(password, adminHash);
-          if (ok) return { id: 'admin', email: adminEmail, name: 'Admin', role: 'admin' };
+          try {
+            const ok = await bcrypt.compare(password, adminHash);
+            if (ok) return { id: 'admin', email: adminEmail, name: 'Admin', role: 'admin' };
+          } catch {
+            // Invalid hash format (e.g. plain text in ADMIN_PASSWORD_HASH) — treat as failed login
+          }
         }
 
         // 2. Try Convex user (dynamic import to avoid build-time dependency)

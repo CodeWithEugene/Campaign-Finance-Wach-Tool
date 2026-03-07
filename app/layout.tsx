@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   description:
     'Track political financing, visualize campaign finance data, and monitor misuse of public resources in Kenya.',
   icons: {
-    icon: '/images/icon/icon.png',
+    icon: '/images/favicon/favicon.ico',
     apple: '/images/icon/icon.png',
   },
   openGraph: {
