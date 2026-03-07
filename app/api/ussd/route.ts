@@ -11,10 +11,30 @@ const categoryMap: Record<string, 'vote-buying' | 'illegal-donations' | 'misuse-
   '6': 'other',
 };
 
+/** GET: so you can verify the callback URL is reachable (e.g. open in browser). */
+export async function GET() {
+  return new NextResponse(
+    'Campaign Finance Watch USSD callback. Use POST with sessionId, serviceCode, phoneNumber, text (Africa\'s Talking).',
+    { headers: { 'Content-Type': 'text/plain' } }
+  );
+}
+
+/** Get USSD 'text' from request body. Africa's Talking sends application/x-www-form-urlencoded. */
+async function getUssdText(request: NextRequest): Promise<string> {
+  const contentType = request.headers.get('content-type') ?? '';
+  if (contentType.includes('application/x-www-form-urlencoded')) {
+    const body = await request.text();
+    const params = new URLSearchParams(body);
+    return params.get('text') ?? '';
+  }
+  const formData = await request.formData();
+  const value = formData.get('text');
+  return typeof value === 'string' ? value : '';
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
-    const text = (formData.get('text') as string) || '';
+    const text = await getUssdText(request);
     const parts = text.split('*').filter(Boolean);
 
     let response: string;

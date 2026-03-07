@@ -94,15 +94,14 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for Africa's Talking and other optional
 
 Admin sign-in is at **`/{locale}/admin/login`** (e.g. [http://localhost:3000/en/admin/login](http://localhost:3000/en/admin/login)). It uses `ADMIN_EMAIL` and `ADMIN_PASSWORD_HASH` from your env.
 
+**Next.js expands `$` in `.env`**, so a raw bcrypt hash (which contains `$2a$10$...`) gets corrupted unless each `$` is escaped as `\$`.
+
 1. **Set `ADMIN_EMAIL`** to the admin email (e.g. `admin@cfwt.com`).
-2. **Set `ADMIN_PASSWORD_HASH`** to a **bcrypt hash** of the password, **not** the plain password.
-   - Generate a hash:  
-     `node -e "console.log(require('bcryptjs').hashSync('YOUR_PASSWORD', 10))"`
-   - In `.env`, **wrap the hash in single quotes** so the `$` in the hash is not expanded:  
-     `ADMIN_PASSWORD_HASH='$2a$10$...'`
-   - Example from the repo: email `admin@cfwt.com`, password `Admin123!` (use the hash from `.env.example`).
+2. **Set `ADMIN_PASSWORD_HASH`** to a bcrypt hash with **escaped dollars**:
+   - **Easiest:** run `node scripts/generate-admin-hash.js` (or `node scripts/generate-admin-hash.js "YourPassword"`) and paste the two lines it prints into your `.env`.
+   - Or copy the `ADMIN_EMAIL` and `ADMIN_PASSWORD_HASH` lines from `.env.example` into `.env` (the hash there is escaped and works with password `Admin123!`).
 3. Restart the dev server after changing `.env`.
-4. On **Vercel**, add both `ADMIN_EMAIL` and `ADMIN_PASSWORD_HASH` in Project → Settings → Environment Variables (and quote the hash there too if the UI allows).
+4. On **Vercel**, add both variables in Settings → Environment Variables. For the hash, paste the value **with** backslashes before each `$` (e.g. `\$2a\$10\$...`).
 
 ### Convex setup
 
