@@ -8,64 +8,44 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Service not configured' }, { status: 503 });
   }
 
+  const publicKey = process.env.PAYSTACK_PUBLIC_KEY;
+  if (!publicKey) {
+    return NextResponse.json({ error: 'Paystack not configured' }, { status: 500 });
+  }
+
   try {
     const convex = new ConvexHttpClient(convexUrl);
     const body = await request.json();
-    const { amount, partyId, partyName, email, locale } = body as {
+    const { amount, partyId, partyName, email } = body as {
       amount: number;
       partyId: string;
       partyName: string;
       email?: string;
-      locale?: string;
     };
-    const loc = locale || 'en';
+
     if (!amount || amount < 100 || !partyId || !partyName) {
       return NextResponse.json(
         { error: 'Missing or invalid amount, partyId, or partyName' },
         { status: 400 }
       );
     }
-    const secret = process.env.PAYSTACK_SECRET_KEY;
-    if (!secret) {
-      return NextResponse.json({ error: 'Paystack not configured' }, { status: 500 });
-    }
+
+    // Generate a unique reference and record the pending contribution in Convex.
+    // The Paystack Inline popup in the browser will use the public key + reference
+    // to process the payment — no server-side Paystack session needed.
     const reference = `mchango-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-    const contributionId = await convex.mutation(api.contributions.create, {
+
+    await convex.mutation(api.contributions.create, {
       amount,
       partyId,
       partyName,
       paystackReference: reference,
       email: email || undefined,
     });
-    const res = await fetch('https://api.paystack.co/transaction/initialize', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${secret}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: email || 'donor@campaignwatch.ke',
-        amount: amount * 100,
-        reference,
-        callback_url: `${process.env.NEXTAUTH_URL || request.nextUrl.origin}/api/mchango/callback?reference=${reference}&party=${encodeURIComponent(partyId)}&amount=${amount}&locale=${loc}`,
-        metadata: {
-          contributionId: contributionId,
-          partyId,
-          partyName,
-        },
-      }),
-    });
-    const data = (await res.json()) as { status?: boolean; data?: { authorization_url: string }; message?: string };
-    if (!data.status || !data.data?.authorization_url) {
-      return NextResponse.json(
-        { error: data.message || 'Paystack init failed' },
-        { status: 400 }
-      );
-    }
-    return NextResponse.json({
-      authorizationUrl: data.data.authorization_url,
-      reference,
-    });
+
+    // Return public key and reference to the client for use with PaystackPop.
+    // Never return the secret key here.
+    return NextResponse.json({ reference, publicKey });
   } catch (e) {
     console.error('Mchango init error:', e);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
