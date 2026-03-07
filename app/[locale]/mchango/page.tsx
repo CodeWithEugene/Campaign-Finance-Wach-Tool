@@ -148,22 +148,12 @@ export default function MchangoPage() {
 
   const handleDonate = (partyId: string) => {
     setSelectedParty(partyId);
-    // Scroll to donation form
-    document.getElementById('donation-form')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedParty) return;
     setSubmitting(true);
-    try {
-      // In production, integrate Paystack here
-      // For now, simulate success
-      await new Promise((r) => setTimeout(r, 1500));
-      router.push(`/${locale}/mchango/success?amount=${amount}&party=${selectedParty}`);
-    } catch {
-      setSubmitting(false);
-    }
+    // In production, integrate Paystack here
+    // For now, simulate success
+    setTimeout(() => {
+      router.push(`/${locale}/mchango/success?amount=${amount}&party=${partyId}`);
+    }, 1500);
   };
 
   const getPercentage = (raised: number, goal: number) => {
@@ -269,67 +259,31 @@ export default function MchangoPage() {
           </div>
         </div>
 
-        {/* Donation Form */}
-        <div id="donation-form" className="max-w-2xl mx-auto">
-          <Card>
-            <h2 className="font-display font-bold text-2xl mb-6">Make Your Contribution</h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Legal Compliance Notice */}
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+            <h3 className="font-bold text-lg mb-3">Legal Compliance & Transparency</h3>
+            <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
               <div>
-                <label className="block mb-2 font-medium">
-                  Select party <span className="text-[var(--accent-2)]">*</span>
-                </label>
-                <select
-                  value={selectedParty}
-                  onChange={(e) => setSelectedParty(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus:border-[var(--accent-1)] outline-none"
-                >
-                  <option value="">Choose a party...</option>
-                  {parties.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block mb-2 font-medium">
-                  Amount (KES) <span className="text-[var(--accent-2)]">*</span>
-                </label>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(Number(e.target.value))}
-                  min={minAmount}
-                  max={maxAmount}
-                  className="w-full px-4 py-3 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus:border-[var(--accent-1)] outline-none"
-                />
-                <p className="text-sm text-[var(--text-secondary)] mt-2">
-                  Min: KES {minAmount.toLocaleString()} — Max: KES {maxAmount.toLocaleString()}
-                </p>
-              </div>
-
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <h3 className="font-bold mb-2">Legal Compliance</h3>
-                <ul className="text-sm text-gray-700 space-y-1">
+                <h4 className="font-semibold mb-2">Contribution Rules:</h4>
+                <ul className="space-y-1">
                   <li>• All contributions are publicly recorded</li>
                   <li>• No foreign donations accepted</li>
                   <li>• Must comply with campaign finance limits</li>
                   <li>• Anonymous donations not permitted</li>
                 </ul>
               </div>
-
-              <button
-                type="submit"
-                disabled={submitting || !selectedParty}
-                className="w-full py-4 bg-[var(--accent-1)] text-white font-bold rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
-              >
-                {submitting ? 'Processing...' : `Donate KES ${amount.toLocaleString()} via Paystack`}
-              </button>
-            </form>
-          </Card>
+              <div>
+                <h4 className="font-semibold mb-2">Payment Information:</h4>
+                <ul className="space-y-1">
+                  <li>• Secure payment via Paystack</li>
+                  <li>• M-Pesa and card payments accepted</li>
+                  <li>• Instant receipt and confirmation</li>
+                  <li>• Full transparency and audit trail</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
