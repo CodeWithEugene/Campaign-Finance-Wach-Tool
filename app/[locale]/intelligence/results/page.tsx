@@ -133,6 +133,9 @@ function ResultsContent() {
         <Link href={`/${locale}/intelligence`} className="text-[var(--accent-1)] hover:underline text-sm">
           ← Intelligence
         </Link>
+        <Link href={`/${locale}/intelligence#data-sources`} className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent-1)] hover:underline">
+          Official data sources →
+        </Link>
       </div>
 
       {/* Hero: photo + name + bio (prefilled data from the internet) */}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Search, Users, User, Clock, TrendingUp } from 'lucide-react';
+import { Search, Users, User, Clock, TrendingUp, ExternalLink, Database } from 'lucide-react';
 import { getAllIntelligenceEntities } from '@/lib/intelligenceData';
 
 const POPULAR_PARTIES = [
@@ -224,6 +224,106 @@ export default function IntelligencePage() {
           </div>
         </section>
       )}
+
+      <section id="data-sources" className="mb-10 p-6 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)]">
+        <h2 className="flex items-center gap-2 font-display font-bold text-xl mb-4">
+          <Database className="w-5 h-5 text-[var(--accent-1)]" />
+          Official data sources
+        </h2>
+        <p className="text-sm text-[var(--text-secondary)] mb-4">
+          All intelligence is tied to public records and official portals. Use these links to verify and explore actual data.
+        </p>
+        <ul className="space-y-3 text-sm">
+          <li>
+            <a
+              href="https://orpp.or.ke/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-[var(--accent-1)] hover:underline"
+            >
+              <ExternalLink className="w-4 h-4 flex-shrink-0" />
+              Office of the Registrar of Political Parties (ORPP) — PPF administration, registered parties, fund distribution
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://orpp.or.ke/document/political-parties-fund-ppf-distribution-2023/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-[var(--accent-1)] hover:underline"
+            >
+              <ExternalLink className="w-4 h-4 flex-shrink-0" />
+              ORPP — Political Parties Fund (PPF) distribution by year
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.oagkenya.go.ke/political-parties-audit-reports/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-[var(--accent-1)] hover:underline"
+            >
+              <ExternalLink className="w-4 h-4 flex-shrink-0" />
+              Office of the Auditor-General (OAG) — Political parties audit reports
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.oagkenya.go.ke/public-funded-political-parties/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-[var(--accent-1)] hover:underline"
+            >
+              <ExternalLink className="w-4 h-4 flex-shrink-0" />
+              OAG — Public funded political parties
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.iebc.or.ke/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-[var(--accent-1)] hover:underline"
+            >
+              <ExternalLink className="w-4 h-4 flex-shrink-0" />
+              IEBC — Independent Electoral and Boundaries Commission (election results, party list)
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.iebc.or.ke/index.php/election-results"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-[var(--accent-1)] hover:underline"
+            >
+              <ExternalLink className="w-4 h-4 flex-shrink-0" />
+              IEBC — Election results portal
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://tikenya.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-[var(--accent-1)] hover:underline"
+            >
+              <ExternalLink className="w-4 h-4 flex-shrink-0" />
+              Transparency International Kenya (TI-Kenya) — Campaign finance and governance reports
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://campaignwatch.tikenya.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-[var(--accent-1)] hover:underline"
+            >
+              <ExternalLink className="w-4 h-4 flex-shrink-0" />
+              Campaign Watch (TI-Kenya) — Report misuse of public resources during campaigns
+            </a>
+          </li>
+        </ul>
+      </section>
 
       <div className="grid sm:grid-cols-2 gap-6">
         <div className="p-6 rounded-xl border-2 border-[var(--accent-1)]/50 bg-[var(--bg-secondary)]">
