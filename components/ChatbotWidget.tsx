@@ -7,14 +7,27 @@ import { getSpeechLang, getVoiceForLang } from '@/lib/speechLocale';
 
 type Message = { role: 'user' | 'assistant'; content: string };
 
+/** Browser Speech Recognition is not in TS lib; type the shape we use. */
+interface SpeechRecognitionLike {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  onresult: ((e: { resultIndex: number; results: { isFinal: boolean; [0]: { transcript: string } }[] }) => void) | null;
+  onend: (() => void) | null;
+  onerror: (() => void) | null;
+}
+type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike;
+
 declare global {
   interface Window {
-    SpeechRecognition?: typeof SpeechRecognition;
-    webkitSpeechRecognition?: typeof SpeechRecognition;
+    SpeechRecognition?: SpeechRecognitionConstructorLike;
+    webkitSpeechRecognition?: SpeechRecognitionConstructorLike;
   }
 }
 
-function getSpeechRecognition(): typeof SpeechRecognition | null {
+function getSpeechRecognition(): SpeechRecognitionConstructorLike | null {
   if (typeof window === 'undefined') return null;
   return window.SpeechRecognition ?? window.webkitSpeechRecognition ?? null;
 }
@@ -137,7 +150,7 @@ export function ChatbotWidget() {
     recognition.lang = speechLang;
     recognitionRef.current = recognition;
 
-    recognition.onresult = (e: SpeechRecognitionEvent) => {
+    recognition.onresult = (e) => {
       let final = '';
       let interim = '';
       for (let i = e.resultIndex; i < e.results.length; i++) {
