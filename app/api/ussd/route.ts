@@ -32,7 +32,7 @@ const USSD_STRINGS: Record<
   }
 > = {
   en: {
-    welcome: 'CON Welcome to Campaign Finance Watch\n1. English\n2. Kiswahili\n3. Kikuyu\n4. Kamba',
+    welcome: 'CON Welcome to Knight Watch\n1. English\n2. Kiswahili\n3. Kikuyu\n4. Kamba',
     invalidLang: 'CON Invalid. Select 1-4',
     categoryMenu:
       'CON Select category:\n1. Vote buying\n2. Illegal donations\n3. Misuse of public resources\n4. Undeclared spending\n5. Bribery\n6. Other',
@@ -48,7 +48,7 @@ const USSD_STRINGS: Record<
     error: 'END An error occurred. Please try again.',
   },
   sw: {
-    welcome: 'CON Karibu Campaign Finance Watch\n1. English\n2. Kiswahili\n3. Kikuyu\n4. Kamba',
+    welcome: 'CON Karibu Knight Watch\n1. English\n2. Kiswahili\n3. Kikuyu\n4. Kamba',
     invalidLang: 'CON Batili. Chagua 1-4',
     categoryMenu:
       'CON Chagua aina:\n1. Ununuzi wa kura\n2. Michango haramu\n3. Matumizi mabaya ya rasilimali\n4. Matumizi yasiyodhihirishwa\n5. Rushwa\n6. Nyingine',
@@ -64,7 +64,7 @@ const USSD_STRINGS: Record<
     error: 'END Hitilafu imetokea. Tafadhali jaribu tena.',
   },
   ki: {
-    welcome: 'CON Wĩkĩrĩre Campaign Finance Watch\n1. English\n2. Kiswahili\n3. Kikuyu\n4. Kamba',
+    welcome: 'CON Wĩkĩrĩre Knight Watch\n1. English\n2. Kiswahili\n3. Kikuyu\n4. Kamba',
     invalidLang: 'CON Ti wega. Hithia 1-4',
     categoryMenu:
       'CON Hithia mũhĩrĩro:\n1. Gūgura kura\n2. Mĩcango mĩũru\n3. Gũtumia rasilimali nĩ ũndũ mũũru\n4. Gũtumia tũthingu tũtarĩ na mũhĩrĩro\n5. Rũgongo\n6. Rĩngĩ',
@@ -80,7 +80,7 @@ const USSD_STRINGS: Record<
     error: 'END Kĩũmbe kĩonekire. Ndũrũmĩrĩra ringĩ.',
   },
   kam: {
-    welcome: 'CON Mũvaka Campaign Finance Watch\n1. English\n2. Kiswahili\n3. Kikuyu\n4. Kamba',
+    welcome: 'CON Mũvaka Knight Watch\n1. English\n2. Kiswahili\n3. Kikuyu\n4. Kamba',
     invalidLang: 'CON Tene. Sya 1-4',
     categoryMenu:
       'CON Sya mũsango:\n1. Kũgula kura\n2. Mĩsango ya kũvũa\n3. Kũtumia vyũ na ũsũngi\n4. Kũtumia tũndũ twa kũvũa\n5. Kũvũa ndalama\n6. Ndingĩ',
@@ -108,7 +108,7 @@ function getLang(choice: string | undefined): LangCode {
 /** GET: so you can verify the callback URL is reachable (e.g. open in browser). */
 export async function GET() {
   return new NextResponse(
-    'Campaign Finance Watch USSD callback. Use POST with sessionId, serviceCode, phoneNumber, text (Africa\'s Talking).',
+    'Knight Watch USSD callback. Use POST with sessionId, serviceCode, phoneNumber, text (Africa\'s Talking).',
     { headers: { 'Content-Type': 'text/plain' } }
   );
 }
