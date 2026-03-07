@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import { Menu, X, Search } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
@@ -28,6 +29,7 @@ function getLocalizedHref(href: string, pathname: string | null): string {
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
+  const { data: session, status } = useSession();
   const locale = pathname?.split('/')[1] || 'en';
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -95,6 +97,30 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
+            {status === 'authenticated' ? (
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: `/${locale}` })}
+                className="hidden sm:block px-3 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-primary)] rounded-lg"
+              >
+                Sign out
+              </button>
+            ) : (
+              <>
+                <Link
+                  href={`/${locale}/login`}
+                  className="hidden sm:block px-3 py-2 text-sm font-medium text-[var(--accent-1)] hover:bg-[var(--bg-primary)] rounded-lg"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href={`/${locale}/signup`}
+                  className="hidden sm:block px-3 py-2 text-sm font-medium bg-[var(--accent-1)] text-white rounded-lg hover:opacity-90"
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
             <LanguageSwitcher />
             <ThemeToggle />
             <button

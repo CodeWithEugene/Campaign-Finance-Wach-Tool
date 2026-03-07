@@ -259,15 +259,15 @@ export function AccessibilityWidget() {
   if (!mounted) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-2">
-      {/* Slide-in panel */}
+    <div className="relative">
+      {/* Slide-in panel (absolute so it doesn't push the button up) */}
       <div
         ref={panelRef}
         role="dialog"
         aria-label="Accessibility options"
         aria-modal="true"
         hidden={!open}
-        className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl shadow-2xl w-[320px] max-w-[calc(100vw-3rem)] overflow-hidden transition-transform duration-300 ease-out ${
+        className={`absolute right-14 bottom-0 w-[320px] max-w-[calc(100vw-3rem)] max-h-[70vh] bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl shadow-2xl overflow-hidden transition-transform duration-300 ease-out ${
           open ? 'translate-x-0' : 'translate-x-full opacity-0 pointer-events-none'
         }`}
       >
@@ -282,7 +282,7 @@ export function AccessibilityWidget() {
             <span className="text-xl leading-none" aria-hidden>×</span>
           </button>
         </div>
-        <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
+        <div className="p-4 space-y-4 overflow-y-auto max-h-[calc(70vh-4rem)]">
           {/* High contrast */}
           <label className="flex items-center justify-between gap-3 cursor-pointer group">
             <span className="text-sm font-medium">High contrast</span>

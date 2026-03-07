@@ -120,6 +120,13 @@ export default defineSchema({
     createdAt: v.number(),
   }).index('by_email', ['email']),
 
+  users: defineTable({
+    email: v.string(),
+    passwordHash: v.string(),
+    name: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index('by_email', ['email']),
+
   notifications: defineTable({
     userId: v.string(),
     title: v.string(),

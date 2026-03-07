@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
+import type { ReportCategory, ReportStatus } from '@/convex/schema';
 import { MapView } from '@/components/map/MapView';
 import { Card } from '@/components/ui/Card';
 
@@ -28,8 +29,8 @@ export default function MapPage() {
   const [viewMode, setViewMode] = useState<'markers' | 'heat'>('markers');
 
   const reports = useQuery(api.reports.listForMap, {
-    category: selectedCategory || undefined,
-    status: selectedStatus || undefined,
+    category: (selectedCategory || undefined) as ReportCategory | undefined,
+    status: (selectedStatus || undefined) as ReportStatus | undefined,
   });
 
   return (

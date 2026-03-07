@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
@@ -7,7 +8,7 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { VerificationBadge } from '@/components/shared/VerificationBadge';
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const locale = pathname?.split('/')[1] || 'en';
@@ -62,5 +63,13 @@ export default function SearchPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="max-w-4xl mx-auto px-4 py-12 animate-pulse">Loading...</div>}>
+      <SearchContent />
+    </Suspense>
   );
 }

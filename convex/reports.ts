@@ -10,13 +10,14 @@ export const list = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let q = ctx.db.query('reports');
-    if (args.status) q = q.withIndex('by_status', (e) => e.eq('status', args.status!));
-    else if (args.category) q = q.withIndex('by_category', (e) => e.eq('category', args.category!));
-    else if (args.county) q = q.withIndex('by_county', (e) => e.eq('county', args.county!));
-    else q = q.withIndex('by_created');
-    const reports = await q.order('desc').take(args.limit ?? 100);
-    return reports;
+    const q = args.status
+      ? ctx.db.query('reports').withIndex('by_status', (e) => e.eq('status', args.status!))
+      : args.category
+        ? ctx.db.query('reports').withIndex('by_category', (e) => e.eq('category', args.category!))
+        : args.county
+          ? ctx.db.query('reports').withIndex('by_county', (e) => e.eq('county', args.county!))
+          : ctx.db.query('reports').withIndex('by_created');
+    return await q.order('desc').take(args.limit ?? 100);
   },
 });
 
@@ -30,11 +31,15 @@ export const search = query({
   },
   handler: async (ctx, args) => {
     const q = ctx.db.query('reports').withSearchIndex('search_title', (idx) => {
-      let expr = idx;
-      if (args.status) expr = expr.eq('status', args.status);
-      if (args.category) expr = expr.eq('category', args.category);
-      if (args.county) expr = expr.eq('county', args.county);
-      return expr.search('title', args.searchTerm);
+      const withSearch = idx.search('title', args.searchTerm);
+      if (args.status && args.category && args.county) return withSearch.eq('status', args.status).eq('category', args.category).eq('county', args.county);
+      if (args.status && args.category) return withSearch.eq('status', args.status).eq('category', args.category);
+      if (args.status && args.county) return withSearch.eq('status', args.status).eq('county', args.county);
+      if (args.category && args.county) return withSearch.eq('category', args.category).eq('county', args.county);
+      if (args.status) return withSearch.eq('status', args.status);
+      if (args.category) return withSearch.eq('category', args.category);
+      if (args.county) return withSearch.eq('county', args.county);
+      return withSearch;
     });
     return await q.take(args.limit ?? 50);
   },
@@ -156,9 +161,11 @@ export const listForMap = query({
     category: v.optional(reportCategoryValidator),
   },
   handler: async (ctx, args) => {
-    let q = ctx.db.query('reports');
-    if (args.status) q = q.withIndex('by_status', (e) => e.eq('status', args.status!));
-    if (args.category) q = q.withIndex('by_category', (e) => e.eq('category', args.category!));
+    const q = args.status
+      ? ctx.db.query('reports').withIndex('by_status', (e) => e.eq('status', args.status!))
+      : args.category
+        ? ctx.db.query('reports').withIndex('by_category', (e) => e.eq('category', args.category!))
+        : ctx.db.query('reports').withIndex('by_created');
     const reports = await q.order('desc').take(500);
     return reports.map((r) => ({
       _id: r._id,
