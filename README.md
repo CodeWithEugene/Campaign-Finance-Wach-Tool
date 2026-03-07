@@ -85,23 +85,20 @@ cp .env.example .env
 | `PAYSTACK_PUBLIC_KEY` | Paystack public key |
 | `NEXTAUTH_URL` | App URL (e.g. `http://localhost:3000`) |
 | `NEXTAUTH_SECRET` | Random string (e.g. `openssl rand -base64 32`) |
-| `ADMIN_EMAIL` | Admin login email |
-| `ADMIN_PASSWORD_HASH` | bcrypt hash of admin password (see Admin login below) |
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for Africa's Talking and other optional variables.
 
 ### Admin login
 
-Admin sign-in is at **`/{locale}/admin/login`** (e.g. [http://localhost:3000/en/admin/login](http://localhost:3000/en/admin/login)). It uses `ADMIN_EMAIL` and `ADMIN_PASSWORD_HASH` from your env.
+Admin sign-in is at **`/{locale}/admin/login`** (e.g. [http://localhost:3000/en/admin/login](http://localhost:3000/en/admin/login)). Admin credentials are stored in the Convex **admins** table (no env vars needed).
 
-**Next.js expands `$` in `.env`**, so a raw bcrypt hash (which contains `$2a$10$...`) gets corrupted unless each `$` is escaped as `\$`.
+**One-time setup:** seed the default admin so login works:
 
-1. **Set `ADMIN_EMAIL`** to the admin email (e.g. `admin@cfwt.com`).
-2. **Set `ADMIN_PASSWORD_HASH`** to a bcrypt hash with **escaped dollars**:
-   - **Easiest:** run `node scripts/generate-admin-hash.js` (or `node scripts/generate-admin-hash.js "YourPassword"`) and paste the two lines it prints into your `.env`.
-   - Or copy the `ADMIN_EMAIL` and `ADMIN_PASSWORD_HASH` lines from `.env.example` into `.env` (the hash there is escaped and works with password `Admin123!`).
-3. Restart the dev server after changing `.env`.
-4. On **Vercel**, add both variables in Settings → Environment Variables. For the hash, paste the value **with** backslashes before each `$` (e.g. `\$2a\$10\$...`).
+1. Ensure Convex is in sync: run `npx convex dev` (or deploy), then in another terminal:
+   ```bash
+   npx convex run admins:seedDefaultAdmin
+   ```
+2. Default credentials: **admin@cfwt.com** / **Admin123!**
 
 ### Convex setup
 
@@ -133,7 +130,7 @@ Open [http://localhost:3000](http://localhost:3000).
    - **`NEXTAUTH_URL`** – Your production URL (e.g. `https://your-app.vercel.app`). Required for auth and redirects.
    - **`NEXTAUTH_SECRET`** or **`AUTH_SECRET`** – Same as local (e.g. `openssl rand -base64 32`).
    - **`NEXT_PUBLIC_CONVEX_URL`** – Your Convex deployment URL (from [Convex Dashboard](https://dashboard.convex.dev)). The app builds without it (uses a placeholder), but map, reports, signup, and Mchango need it in production.
-   - **`ADMIN_EMAIL`** and **`ADMIN_PASSWORD_HASH`** – If you use admin login.
+   - Admin login uses the Convex **admins** table; run `npx convex run admins:seedDefaultAdmin` once if you use admin login.
    - **`PAYSTACK_SECRET_KEY`** and **`PAYSTACK_PUBLIC_KEY`** – For Mchango payments (optional).
 3. Enable the variables for **Production** (and **Preview** if you want them on PR deployments), then redeploy.
 

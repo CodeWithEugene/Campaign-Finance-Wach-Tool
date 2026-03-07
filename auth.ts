@@ -2,7 +2,6 @@ import NextAuth from 'next-auth';
 import type { NextAuthOptions } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { getServerSession } from 'next-auth';
-import bcrypt from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,30 +16,23 @@ export const authOptions: NextAuthOptions = {
         const password = (credentials?.password as string) || '';
         if (!email || !password) return null;
 
-        // 1. Try admin (env-based)
-        const adminEmail = process.env.ADMIN_EMAIL?.trim();
-        const adminHash = process.env.ADMIN_PASSWORD_HASH?.trim();
-        if (adminEmail && adminHash && email.toLowerCase() === adminEmail.toLowerCase()) {
-          try {
-            const ok = await bcrypt.compare(password, adminHash);
-            if (ok) return { id: 'admin', email: adminEmail, name: 'Admin', role: 'admin' };
-          } catch (err) {
-            console.error('[auth] Admin bcrypt compare failed (check ADMIN_PASSWORD_HASH is a valid bcrypt hash):', err);
-          }
-        }
-
-        // 2. Try Convex user (dynamic import to avoid build-time dependency)
         const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
-        if (convexUrl) {
-          try {
-            const { ConvexHttpClient } = await import('convex/browser');
-            const { api } = await import('@/convex/_generated/api');
-            const client = new ConvexHttpClient(convexUrl);
-            const user = await client.action(api.auth.verifyUser, { email, password });
-            if (user) return { id: user.id, email: user.email, name: user.name ?? 'User', role: 'user' };
-          } catch (err) {
-            console.error('[auth] Convex verifyUser failed:', err);
-          }
+        if (!convexUrl) return null;
+
+        try {
+          const { ConvexHttpClient } = await import('convex/browser');
+          const { api } = await import('@/convex/_generated/api');
+          const client = new ConvexHttpClient(convexUrl);
+
+          // 1. Try admin (from Convex admins table)
+          const admin = await client.action(api.auth.verifyAdmin, { email, password });
+          if (admin) return admin;
+
+          // 2. Try Convex user
+          const user = await client.action(api.auth.verifyUser, { email, password });
+          if (user) return { id: user.id, email: user.email, name: user.name ?? 'User', role: 'user' };
+        } catch (err) {
+          console.error('[auth] Convex auth failed:', err);
         }
         return null;
       },
