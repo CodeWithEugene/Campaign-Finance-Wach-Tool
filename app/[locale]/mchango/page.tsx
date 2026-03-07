@@ -6,6 +6,7 @@ import Script from 'next/script';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Card } from '@/components/ui/Card';
+import { PartyCardsScroll } from '@/components/mchango/PartyCardsScroll';
 
 // Paystack Inline JS type declaration
 declare global {
@@ -32,13 +33,21 @@ export default function MchangoPage() {
   const paystackReady = useRef(false);
 
   const parties = useQuery(api.parties.list);
+  const totalsByParty = useQuery(api.contributions.totalsByParty) ?? {};
   const seedParties = useMutation(api.parties.seed);
+  const formSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (parties && parties.length === 0) {
       seedParties().catch(() => {});
     }
   }, [parties, seedParties]);
+
+  const handleDonateFromCard = (slug: string) => {
+    setParty(slug);
+    setError('');
+    formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const [party, setParty] = useState('');
   const [amount, setAmount] = useState(100);
@@ -125,15 +134,27 @@ export default function MchangoPage() {
         onLoad={() => { paystackReady.current = true; }}
       />
 
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <h1 className="font-display font-black text-3xl lg:text-4xl mb-2">
-          Mchango — Crowdfunding
-        </h1>
-        <p className="text-[var(--text-secondary)] mb-8">
-          Contribute to political parties or candidates transparently via Paystack
-          (M-Pesa, cards).
-        </p>
+      <div className="px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div className="max-w-2xl mx-auto mb-10">
+          <h1 className="font-display font-black text-3xl lg:text-4xl mb-2">
+            Mchango — Crowdfunding
+          </h1>
+          <p className="text-[var(--text-secondary)] mb-8">
+            Contribute to political parties or candidates transparently via Paystack
+            (M-Pesa, cards).
+          </p>
+        </div>
 
+        <div className="max-w-full overflow-hidden">
+          <PartyCardsScroll
+            parties={partyList}
+            totalsByParty={totalsByParty}
+            onDonate={handleDonateFromCard}
+            locale={locale}
+          />
+        </div>
+
+        <div ref={formSectionRef} className="max-w-2xl mx-auto mt-10">
         <form onSubmit={handleSubmit} className="space-y-6">
           <Card>
             <label className="block mb-2 font-medium">
@@ -214,6 +235,7 @@ export default function MchangoPage() {
             {submitting ? 'Opening checkout...' : 'Proceed to Paystack'}
           </button>
         </form>
+        </div>
       </div>
     </>
   );

@@ -10,14 +10,24 @@ export const list = query({
   },
 });
 
+const DEFAULT_PARTIES = [
+  { slug: 'uda', name: 'United Democratic Alliance', order: 1 },
+  { slug: 'odm', name: 'Orange Democratic Movement', order: 2 },
+  { slug: 'jubilee', name: 'Jubilee Party', order: 3 },
+  { slug: 'wdm-k', name: 'Wiper Democratic Movement - Kenya', order: 4 },
+];
+
 export const seed = mutation({
   args: {},
   handler: async (ctx) => {
-    const existing = await ctx.db.query('parties').first();
-    if (existing) return 'already_seeded';
-    await ctx.db.insert('parties', { slug: 'uda', name: 'United Democratic Alliance', order: 1 });
-    await ctx.db.insert('parties', { slug: 'odm', name: 'Orange Democratic Movement', order: 2 });
-    await ctx.db.insert('parties', { slug: 'jubilee', name: 'Jubilee Party', order: 3 });
-    return 'seeded';
+    let added = 0;
+    for (const p of DEFAULT_PARTIES) {
+      const existing = await ctx.db.query('parties').withIndex('by_slug', (q) => q.eq('slug', p.slug)).first();
+      if (!existing) {
+        await ctx.db.insert('parties', p);
+        added++;
+      }
+    }
+    return added > 0 ? 'seeded' : 'already_seeded';
   },
 });
