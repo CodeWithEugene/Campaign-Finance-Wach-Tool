@@ -46,8 +46,18 @@ export default function DashboardPage() {
     return <div className="max-w-7xl mx-auto px-4 py-12 text-center">Loading...</div>;
   }
 
+  const hasNoData = stats.total === 0;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+      {hasNoData && (
+        <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-200">
+          <p className="font-medium">No data yet.</p>
+          <p className="text-sm mt-1">
+            If you deployed to Vercel, set <code className="bg-black/10 px-1 rounded">NEXT_PUBLIC_CONVEX_URL</code> and <code className="bg-black/10 px-1 rounded">CONVEX_URL</code> to your Convex deployment URL (e.g. <code className="bg-black/10 px-1 rounded">https://neighborly-albatross-355.convex.cloud</code>) in Project Settings → Environment Variables, then redeploy.
+          </p>
+        </div>
+      )}
       <div>
         <h1 className="font-display font-black text-3xl lg:text-4xl mb-2">
           Overview Dashboard

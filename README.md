@@ -130,10 +130,10 @@ Open [http://localhost:3000](http://localhost:3000).
    - **`NEXTAUTH_URL`** – Your production URL (e.g. `https://your-app.vercel.app`). Required for auth and redirects.
    - **`NEXTAUTH_SECRET`** or **`AUTH_SECRET`** – Same as local (e.g. `openssl rand -base64 32`).
    - **`CONVEX_URL`** – Your Convex deployment URL (same as below). **Required for login** so the server can verify credentials.
-   - **`NEXT_PUBLIC_CONVEX_URL`** – Same Convex URL (for map, reports, signup). The app builds without it (uses a placeholder), but map, reports, signup, and Mchango need it in production.
+   - **`NEXT_PUBLIC_CONVEX_URL`** – Same Convex URL (for **dashboard**, map, reports, signup). **Required** or the dashboard/map/reports will show zeros. Example: `https://neighborly-albatross-355.convex.cloud`.
    - Admin login uses the Convex **admins** table; run `npx convex run admins:seedDefaultAdmin` once if you use admin login.
    - **`PAYSTACK_SECRET_KEY`** and **`PAYSTACK_PUBLIC_KEY`** – For Mchango payments (optional).
-3. Enable the variables for **Production** (and **Preview** if you want them on PR deployments), then redeploy.
+3. Enable the variables for **Production** (and **Preview** if you want them on PR deployments), then **redeploy** (Deployments → … → Redeploy). The dashboard and reports need `NEXT_PUBLIC_CONVEX_URL` at build time to connect to your Convex backend.
 
 ---
 
