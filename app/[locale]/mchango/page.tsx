@@ -33,7 +33,7 @@ export default function MchangoPage() {
   const paystackReady = useRef(false);
 
   const parties = useQuery(api.parties.list);
-  const totalsByParty = useQuery(api.contributions.totalsByParty) ?? {};
+  const totalsByParty = useQuery(api.contributions.totalsByParty, {}) ?? {};
   const seedParties = useMutation(api.parties.seed);
   const formSectionRef = useRef<HTMLDivElement>(null);
 
