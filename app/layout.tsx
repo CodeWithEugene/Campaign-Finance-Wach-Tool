@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { DM_Sans, Source_Sans_3, JetBrains_Mono } from 'next/font/google';
 import { Providers } from './providers';
 import { SkipLink } from '@/components/layout/SkipLink';
@@ -6,6 +7,17 @@ import { AccessibilityWidget } from '@/components/AccessibilityWidget';
 import { ChatbotWidget } from '@/components/ChatbotWidget';
 import './globals.css';
 import 'leaflet/dist/leaflet.css';
+
+const themeScript = `
+(function() {
+  try {
+    var t = localStorage.getItem('theme');
+    var d = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (t === 'dark' || (!t && d)) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  } catch (e) {}
+})();
+`;
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -61,6 +73,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <Script id="theme-init" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: themeScript }} />
       <body
         className={`${dmSans.variable} ${sourceSans.variable} ${jetbrainsMono.variable} antialiased min-h-screen`}
       >

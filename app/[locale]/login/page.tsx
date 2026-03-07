@@ -1,11 +1,18 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { getSafeCallbackUrl } from '@/lib/authRedirect';
+
+function getErrorMessage(errorParam: string | null): string {
+  if (errorParam === 'Configuration') return 'Sign-in is temporarily unavailable. Please try again later or contact support.';
+  if (errorParam === 'SigninFailed') return 'Sign-in failed. Please try again.';
+  if (errorParam === 'Credentials') return 'Invalid email or password.';
+  return '';
+}
 
 function LoginForm() {
   const pathname = usePathname();
@@ -17,6 +24,11 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const err = searchParams.get('error');
+    if (err) setError(getErrorMessage(err));
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
