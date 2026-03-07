@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import {
+  findIntelligenceEntity,
+  getActivitiesForPeriod,
+  type IntelligenceActivity,
+} from '@/lib/intelligenceData';
 
-export type ActivityCategory = 'rally' | 'financial' | 'news' | 'other';
-
-export interface IntelligenceActivity {
-  title: string;
-  description: string;
-  date: string;
-  category: ActivityCategory;
-  tags: string[];
-  location: string;
-  amount?: string;
-  sourceUrl?: string;
-}
+export type { IntelligenceActivity, ActivityCategory } from '@/lib/intelligenceData';
 
 const CAMPAIGN_PERIODS: Record<string, string> = {
   '2017': '2017 general election campaign period (roughly 2016–2017)',
@@ -75,6 +69,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing or empty query "q"' }, { status: 400 });
   }
 
+  // 1. Prefilled data: match entity and return activities for period
+  const entity = findIntelligenceEntity(q, type);
+  if (entity) {
+    const activities = getActivitiesForPeriod(entity, campaignPeriod);
+    return NextResponse.json({
+      activities,
+      query: q,
+      type,
+      campaignPeriod,
+      entity: {
+        id: entity.id,
+        name: entity.name,
+        type: entity.type,
+        imageUrl: entity.imageUrl,
+        bio: entity.bio,
+      },
+      source: 'prefilled',
+    });
+  }
+
+  // 2. Fallback: Gemini for entities not in prefilled set
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
@@ -89,9 +104,15 @@ export async function POST(request: NextRequest) {
     const result = await model.generateContent(prompt);
     let text = result.response.text() ?? '';
     if (!text) {
-      return NextResponse.json({ activities: [], message: 'No response from model' });
+      return NextResponse.json({
+        activities: [],
+        query: q,
+        type,
+        campaignPeriod,
+        entity: null,
+        source: 'gemini',
+      });
     }
-    // Strip markdown code block if present
     const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) ?? [null, text];
     const jsonStr = (jsonMatch[1] ?? text).trim();
     const parsed = JSON.parse(jsonStr) as unknown;
@@ -105,7 +126,14 @@ export async function POST(request: NextRequest) {
         )
       : [];
 
-    return NextResponse.json({ activities, query: q, type, campaignPeriod });
+    return NextResponse.json({
+      activities,
+      query: q,
+      type,
+      campaignPeriod,
+      entity: null,
+      source: 'gemini',
+    });
   } catch (err) {
     console.error('[intelligence] Gemini error:', err);
     return NextResponse.json(

@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Calendar,
   MapPin,
@@ -11,6 +12,8 @@ import {
   Banknote,
   Newspaper,
   LayoutGrid,
+  User,
+  Users,
 } from 'lucide-react';
 import type { IntelligenceActivity, ActivityCategory } from '@/app/api/intelligence/route';
 
@@ -49,6 +52,14 @@ function ResultsContent() {
   const [period, setPeriod] = useState(initialPeriod);
   const [activeTab, setActiveTab] = useState<'all' | ActivityCategory>('all');
   const [activities, setActivities] = useState<IntelligenceActivity[]>([]);
+  const [entity, setEntity] = useState<{
+    id: string;
+    name: string;
+    type: string;
+    imageUrl: string;
+    bio?: string;
+  } | null>(null);
+  const [imageError, setImageError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,10 +67,12 @@ function ResultsContent() {
     if (!q) {
       setLoading(false);
       setActivities([]);
+      setEntity(null);
       return;
     }
     setLoading(true);
     setError(null);
+    setImageError(false);
     fetch('/api/intelligence', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -71,10 +84,12 @@ function ResultsContent() {
       })
       .then((data) => {
         setActivities(data.activities ?? []);
+        setEntity(data.entity ?? null);
       })
       .catch((err) => {
         setError(err.message ?? 'Failed to load intelligence');
         setActivities([]);
+        setEntity(null);
       })
       .finally(() => setLoading(false));
   }, [q, type, period]);
@@ -109,16 +124,50 @@ function ResultsContent() {
     );
   }
 
+  const displayName = entity?.name ?? q;
+  const showPhoto = entity?.imageUrl && !imageError;
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
       <div className="flex flex-wrap items-center gap-4 mb-6">
         <Link href={`/${locale}/intelligence`} className="text-[var(--accent-1)] hover:underline text-sm">
           ← Intelligence
         </Link>
-        <h1 className="font-display font-black text-2xl">
-          {type === 'party' ? 'Party' : 'Politician'}: {q}
-        </h1>
       </div>
+
+      {/* Hero: photo + name + bio (prefilled data from the internet) */}
+      <header className="mb-8 p-6 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] flex flex-col sm:flex-row gap-6 items-start">
+        <div className="flex-shrink-0 w-24 h-24 sm:w-32 sm:h-32 rounded-xl overflow-hidden bg-[var(--bg-primary)] flex items-center justify-center">
+          {showPhoto ? (
+            <Image
+              src={entity!.imageUrl}
+              alt=""
+              width={128}
+              height={128}
+              className="w-full h-full object-cover"
+              unoptimized
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <span className="text-[var(--text-secondary)]">
+              {type === 'party' ? <Users className="w-12 h-12" /> : <User className="w-12 h-12" />}
+            </span>
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm text-[var(--text-secondary)] mb-1">
+            {type === 'party' ? 'Party' : 'Politician'}
+          </p>
+          <h1 className="font-display font-black text-2xl sm:text-3xl mb-2">
+            {displayName}
+          </h1>
+          {entity?.bio && (
+            <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
+              {entity.bio}
+            </p>
+          )}
+        </div>
+      </header>
 
       <div className="mb-6 flex flex-wrap items-center gap-4">
         <label className="flex items-center gap-2 text-sm font-medium text-[var(--text-primary)]">

@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import Image from 'next/image';
 import { Search, Users, User, Clock, TrendingUp } from 'lucide-react';
+import { getAllIntelligenceEntities } from '@/lib/intelligenceData';
 
 const POPULAR_PARTIES = [
   'ODM',
@@ -24,6 +26,38 @@ const RECENT_SEARCHES = [
   'Azimio',
   'Rigathi Gachagua',
 ];
+
+const PREFILLED_POLITICIANS = getAllIntelligenceEntities().filter((e) => e.type === 'politician');
+const PREFILLED_PARTIES_WITH_PHOTOS = getAllIntelligenceEntities().filter((e) => e.type === 'party');
+
+function EntityAvatar({
+  entity,
+  type,
+}: {
+  entity: { id: string; name: string; imageUrl: string };
+  type: 'party' | 'politician';
+}) {
+  const [imgFailed, setImgFailed] = useState(false);
+  return (
+    <div className="w-16 h-16 rounded-full overflow-hidden bg-[var(--bg-primary)] border-2 border-[var(--border-color)] group-hover:border-[var(--accent-1)] flex items-center justify-center">
+      {!imgFailed ? (
+        <Image
+          src={entity.imageUrl}
+          alt=""
+          width={64}
+          height={64}
+          className="w-full h-full object-cover"
+          unoptimized
+          onError={() => setImgFailed(true)}
+        />
+      ) : (
+        <span className="text-[var(--text-secondary)]">
+          {type === 'party' ? <Users className="w-8 h-8" /> : <User className="w-8 h-8" />}
+        </span>
+      )}
+    </div>
+  );
+}
 
 export default function IntelligencePage() {
   const pathname = usePathname();
@@ -132,6 +166,64 @@ export default function IntelligencePage() {
           ))}
         </div>
       </section>
+
+      {/* Prefilled parties with photos from the web */}
+      {PREFILLED_PARTIES_WITH_PHOTOS.length > 0 && (
+        <section className="mb-10">
+          <h2 className="flex items-center gap-2 font-display font-bold text-lg mb-3">
+            <Users className="w-4 h-4 text-[var(--accent-1)]" />
+            Browse parties (with photos)
+          </h2>
+          <div className="flex flex-wrap gap-4">
+            {PREFILLED_PARTIES_WITH_PHOTOS.slice(0, 6).map((entity) => (
+              <button
+                key={entity.id}
+                type="button"
+                onClick={(e) => {
+                  setQuery(entity.name);
+                  setSearchType('party');
+                  handleSearch(e, entity.name);
+                }}
+                className="flex flex-col items-center gap-2 w-24 text-center group"
+              >
+                <EntityAvatar entity={entity} type="party" />
+                <span className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[var(--accent-1)] truncate w-full">
+                  {entity.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Prefilled politicians with photos from the web */}
+      {PREFILLED_POLITICIANS.length > 0 && (
+        <section className="mb-10">
+          <h2 className="flex items-center gap-2 font-display font-bold text-lg mb-3">
+            <User className="w-4 h-4 text-[var(--accent-1)]" />
+            Browse politicians (with photos)
+          </h2>
+          <div className="flex flex-wrap gap-4">
+            {PREFILLED_POLITICIANS.map((entity) => (
+              <button
+                key={entity.id}
+                type="button"
+                onClick={(e) => {
+                  setQuery(entity.name);
+                  setSearchType('politician');
+                  handleSearch(e, entity.name);
+                }}
+                className="flex flex-col items-center gap-2 w-24 text-center group"
+              >
+                <EntityAvatar entity={entity} type="politician" />
+                <span className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[var(--accent-1)] truncate w-full">
+                  {entity.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="grid sm:grid-cols-2 gap-6">
         <div className="p-6 rounded-xl border-2 border-[var(--accent-1)]/50 bg-[var(--bg-secondary)]">

@@ -35,3 +35,32 @@ export const createUser = mutation({
     return { ok: true };
   },
 });
+
+/**
+ * One-time seed: create a user if they don't exist. Use when you need to sign in
+ * on production before using the signup form. Generate passwordHash locally:
+ *   node -e "console.log(require('bcryptjs').hashSync('YourPassword', 10))"
+ * Then run (prod): npx convex run users:seedUser '{"email":"you@example.com","passwordHash":"$2a$10$...","name":"Your Name"}'
+ */
+export const seedUser = mutation({
+  args: {
+    email: v.string(),
+    passwordHash: v.string(),
+    name: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query('users')
+      .withIndex('by_email', (q) => q.eq('email', args.email))
+      .first();
+    if (existing) return { ok: true, message: 'User already exists' };
+    const now = Date.now();
+    await ctx.db.insert('users', {
+      email: args.email,
+      passwordHash: args.passwordHash,
+      name: args.name,
+      createdAt: now,
+    });
+    return { ok: true, message: 'User created. You can sign in with this email and password.' };
+  },
+});
