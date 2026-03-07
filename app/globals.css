@@ -63,6 +63,17 @@
       color var(--duration-base) var(--ease-out);
   }
 
+  html[data-high-contrast] {
+    --text-primary: #000000;
+    --text-secondary: #333333;
+    --border-color: rgba(0, 0, 0, 0.25);
+  }
+  html.dark[data-high-contrast] {
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --border-color: rgba(255, 255, 255, 0.35);
+  }
+
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     font-weight: var(--weight-black);
@@ -141,4 +152,63 @@
     outline: 2px solid var(--accent-1);
     outline-offset: 2px;
   }
+}
+
+/* ===== Floating Accessibility Widget overrides ===== */
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap');
+
+/* Font scale (100%–200%) applied at root */
+html {
+  font-size: calc(100% * var(--a11y-font-scale, 1));
+}
+
+/* High contrast theme (yellow on black) from widget */
+html[data-a11y-high-contrast] {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --text-primary: #ffff00;
+  --text-secondary: #cccc00;
+  --border-color: rgba(255, 255, 0, 0.4);
+  --accent-1: #ffff00;
+  --accent-2: #ffcc00;
+}
+html.dark[data-a11y-high-contrast] {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --text-primary: #ffff00;
+  --text-secondary: #cccc00;
+  --border-color: rgba(255, 255, 0, 0.4);
+}
+
+/* Dyslexia-friendly font (Lexend – readable, heavy-bottomed alternative to OpenDyslexic) */
+body[data-a11y-dyslexia-font] {
+  font-family: 'Lexend', 'Comic Sans MS', 'Segoe UI', sans-serif !important;
+}
+body[data-a11y-dyslexia-font] h1,
+body[data-a11y-dyslexia-font] h2,
+body[data-a11y-dyslexia-font] h3,
+body[data-a11y-dyslexia-font] h4,
+body[data-a11y-dyslexia-font] h5,
+body[data-a11y-dyslexia-font] h6 {
+  font-family: 'Lexend', 'Comic Sans MS', 'Segoe UI', sans-serif !important;
+}
+
+/* Highlight links and buttons */
+body[data-a11y-highlight-links] a,
+body[data-a11y-highlight-links] button {
+  outline: 3px solid #ff0 !important;
+  outline-offset: 2px;
+}
+body[data-a11y-highlight-links] a:focus-visible,
+body[data-a11y-highlight-links] button:focus-visible {
+  outline: 3px solid #ff0 !important;
+  outline-offset: 2px;
+}
+
+/* Stop animations / reduce motion */
+html[data-a11y-reduce-motion] *,
+html[data-a11y-reduce-motion] *::before,
+html[data-a11y-reduce-motion] *::after {
+  transition: none !important;
+  animation: none !important;
 }

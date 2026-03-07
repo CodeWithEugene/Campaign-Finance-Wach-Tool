@@ -1,46 +1,72 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import { Card } from '@/components/ui/Card';
 
-const parties = [
-  { id: 'uda', name: 'United Democratic Alliance' },
-  { id: 'odm', name: 'Orange Democratic Movement' },
-  { id: 'jubilee', name: 'Jubilee Party' },
-];
-
 export default function MchangoPage() {
-  const router = useRouter();
   const pathname = usePathname();
   const locale = pathname?.split('/')[1] || 'en';
+  const parties = useQuery(api.parties.list);
+  const seedParties = useMutation(api.parties.seed);
+
+  useEffect(() => {
+    if (parties && parties.length === 0) {
+      seedParties().catch(() => {});
+    }
+  }, [parties, seedParties]);
   const [party, setParty] = useState('');
   const [amount, setAmount] = useState(100);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const minAmount = 100;
   const maxAmount = 1000000;
+  const partyList = (parties ?? []).length > 0 ? parties! : [
+    { slug: 'uda', name: 'United Democratic Alliance' },
+    { slug: 'odm', name: 'Orange Democratic Movement' },
+    { slug: 'jubilee', name: 'Jubilee Party' },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!party) return;
     setSubmitting(true);
+    setError('');
     try {
-      // In production, integrate Paystack here
-      // For now, simulate success
-      await new Promise((r) => setTimeout(r, 1500));
-      router.push(`/${locale}/mchango/success?amount=${amount}&party=${party}`);
+      const partyName = partyList.find((p) => p.slug === party)?.name ?? party;
+      const res = await fetch('/api/mchango/init', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount,
+          partyId: party,
+          partyName,
+          locale,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Could not start payment');
+        setSubmitting(false);
+        return;
+      }
+      if (data.authorizationUrl) {
+        window.location.href = data.authorizationUrl;
+        return;
+      }
+      setError('Invalid response from server');
     } catch {
-      setSubmitting(false);
+      setError('Network error');
     }
+    setSubmitting(false);
   };
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-      <div
-       
-       
-      >
+      <div>
         <h1 className="font-display font-black text-3xl lg:text-4xl mb-2">
           Mchango — Crowdfunding
         </h1>
@@ -61,8 +87,8 @@ export default function MchangoPage() {
               className="w-full px-4 py-3 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus:border-[var(--accent-1)] outline-none"
             >
               <option value="">Choose...</option>
-              {parties.map((p) => (
-                <option key={p.id} value={p.id}>
+              {partyList.map((p) => (
+                <option key={p.slug} value={p.slug}>
                   {p.name}
                 </option>
               ))}
@@ -95,6 +121,8 @@ export default function MchangoPage() {
               Contributions must comply with Kenyan law. No foreign donations.
             </p>
           </Card>
+
+          {error && <p className="text-sm text-[var(--accent-2)]">{error}</p>}
 
           <button
             type="submit"

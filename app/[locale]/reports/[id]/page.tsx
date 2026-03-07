@@ -1,29 +1,37 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import type { Id } from '@/convex/_generated/dataModel';
 import { Card } from '@/components/ui/Card';
 import { VerificationBadge } from '@/components/shared/VerificationBadge';
 import { Download } from 'lucide-react';
 
 export default function ReportDetailPage() {
   const params = useParams();
-  const id = params?.id as string;
-  const report = {
-    id,
-    title: 'Vote buying at rally',
-    description: 'Cash was distributed to voters at a campaign rally in Nairobi. Witnesses observed envelopes being handed out.',
-    category: 'Vote buying',
-    county: 'Nairobi',
-    date: '2024-01-15',
-    status: 'verified' as const,
-  };
+  const pathname = usePathname();
+  const locale = pathname?.split('/')[1] || 'en';
+  const id = params?.id as Id<'reports'>;
+  const report = useQuery(api.reports.get, id ? { id } : 'skip');
+
+  const displayStatus = report
+    ? report.status === 'verified'
+      ? 'verified'
+      : report.status === 'under_review'
+        ? 'under_review'
+        : 'unverified'
+    : null;
+
+  if (report === undefined) return <div className="max-w-4xl mx-auto px-4 py-12">Loading...</div>;
+  if (report === null) return <div className="max-w-4xl mx-auto px-4 py-12">Report not found.</div>;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
       <div className="fade-in-up">
         <Link
-          href="/reports"
+          href={`/${locale}/reports`}
           className="inline-block text-[var(--accent-1)] hover:underline mb-6"
         >
           ← Back to reports
@@ -35,26 +43,34 @@ export default function ReportDetailPage() {
               {report.title}
             </h1>
             <p className="text-[var(--text-secondary)]">
-              {report.category} • {report.county} • {report.date}
+              {report.category.replace(/-/g, ' ')} • {report.county || report.location} • {new Date(report.createdAt).toLocaleDateString()}
             </p>
           </div>
           <div className="flex gap-2">
-            <VerificationBadge status={report.status} />
-            <button
+            {displayStatus && <VerificationBadge status={displayStatus} />}
+            <a
+              href="/api/export/reports?format=csv"
               className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--border-color)] hover:border-[var(--accent-1)]"
               aria-label="Export report"
             >
               <Download className="w-4 h-4" /> Export
-            </button>
+            </a>
           </div>
         </div>
 
         <Card className="mb-8">
           <h2 className="font-display font-bold text-lg mb-4">Description</h2>
-          <p className="text-[var(--text-secondary)]">{report.description}</p>
+          <p className="text-[var(--text-secondary)] whitespace-pre-wrap">{report.description}</p>
         </Card>
 
-        {report.status === 'verified' && (
+        {report.publicVerificationNote && (
+          <Card>
+            <h2 className="font-display font-bold text-lg mb-4">Verification note</h2>
+            <p className="text-[var(--text-secondary)]">{report.publicVerificationNote}</p>
+          </Card>
+        )}
+
+        {report.status === 'verified' && !report.publicVerificationNote && (
           <Card>
             <h2 className="font-display font-bold text-lg mb-4">Evidence</h2>
             <p className="text-[var(--text-secondary)]">

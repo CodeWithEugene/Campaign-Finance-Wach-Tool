@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import { Card } from '@/components/ui/Card';
 import { Mail } from 'lucide-react';
 
@@ -11,10 +13,18 @@ export default function AlertsPage() {
   const locale = pathname?.split('/')[1] || 'en';
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+  const subscribe = useMutation(api.newsletter.subscribe);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setError('');
+    try {
+      await subscribe({ email, preferences: { alerts: true, digest: true } });
+      setSubmitted(true);
+    } catch {
+      setError('Subscription failed. Try again.');
+    }
   };
 
   return (
@@ -42,6 +52,7 @@ export default function AlertsPage() {
         ) : (
           <form onSubmit={handleSubmit}>
             <Card>
+              {error && <p className="text-sm text-[var(--accent-2)] mb-2">{error}</p>}
               <label className="block mb-2 font-medium">Email address</label>
               <input
                 type="email"

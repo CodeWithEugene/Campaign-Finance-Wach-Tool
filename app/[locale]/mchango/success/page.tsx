@@ -18,6 +18,7 @@ function MchangoSuccessContent() {
   const locale = pathname?.split('/')[1] || 'en';
   const amount = searchParams.get('amount') || '0';
   const party = searchParams.get('party') || '';
+  const reference = searchParams.get('reference') || '';
 
   return (
     <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
@@ -34,9 +35,11 @@ function MchangoSuccessContent() {
           <p className="text-[var(--text-secondary)] mt-2">
             Recipient: {partyNames[party] || party}
           </p>
-          <p className="text-sm text-[var(--text-secondary)] mt-2">
-            Transaction ID: TXN-{Date.now()}
-          </p>
+          {reference && (
+            <p className="text-sm text-[var(--text-secondary)] mt-2">
+              Reference: {reference}
+            </p>
+          )}
         </Card>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link

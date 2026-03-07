@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-
-const locales = ['en', 'sw'];
+import { LOCALE_CODES } from './lib/locales';
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  const pathnameHasLocale = locales.some(
+  const pathnameHasLocale = LOCALE_CODES.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 

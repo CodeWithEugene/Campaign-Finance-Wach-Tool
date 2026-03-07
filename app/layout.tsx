@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { DM_Sans, Source_Sans_3, JetBrains_Mono } from 'next/font/google';
 import { Providers } from './providers';
 import { SkipLink } from '@/components/layout/SkipLink';
+import { AccessibilityWidget } from '@/components/AccessibilityWidget';
 import './globals.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -42,6 +43,7 @@ export default function RootLayout({
         <Providers>
           <SkipLink />
           {children}
+          <AccessibilityWidget />
         </Providers>
       </body>
     </html>

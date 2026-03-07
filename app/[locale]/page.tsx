@@ -6,10 +6,10 @@ import { FileWarning, MapPin, GraduationCap, BarChart3 } from 'lucide-react';
 import { getMessage } from '@/lib/i18n';
 
 const quickActions = [
-  { href: '/report', label: 'Report Misuse', description: 'Submit evidence of campaign finance violations', icon: FileWarning },
-  { href: '/mchango', label: 'Mchango', description: 'Contribute to parties or candidates transparently', icon: BarChart3 },
-  { href: '/learn', label: 'Learn', description: 'Understand campaign funding and legal limits', icon: GraduationCap },
-  { href: '/map', label: 'View Map', description: 'Explore reports on an interactive map', icon: MapPin },
+  { href: '/report', labelKey: 'home.quickReport', descKey: 'home.quickReportDesc', icon: FileWarning },
+  { href: '/mchango', labelKey: 'home.quickMchango', descKey: 'home.quickMchangoDesc', icon: BarChart3 },
+  { href: '/learn', labelKey: 'home.quickLearn', descKey: 'home.quickLearnDesc', icon: GraduationCap },
+  { href: '/map', labelKey: 'home.quickMap', descKey: 'home.quickMapDesc', icon: MapPin },
 ];
 
 export default function HomePage() {
@@ -48,7 +48,7 @@ export default function HomePage() {
 
       <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <h2 className="font-display font-black text-2xl lg:text-3xl mb-8 text-center fade-in-up stagger-1">
-          Take Action
+          {getMessage(locale, 'home.takeAction')}
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {quickActions.map((action, i) => (
@@ -58,8 +58,8 @@ export default function HomePage() {
                 className="block p-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl hover:border-[var(--accent-1)] transition-colors h-full"
               >
                 <action.icon className="w-10 h-10 text-[var(--accent-1)] mb-4" />
-                <h3 className="font-display font-bold text-lg mb-2">{action.label}</h3>
-                <p className="text-sm text-[var(--text-secondary)] font-light">{action.description}</p>
+                <h3 className="font-display font-bold text-lg mb-2">{getMessage(locale, action.labelKey)}</h3>
+                <p className="text-sm text-[var(--text-secondary)] font-light">{getMessage(locale, action.descKey)}</p>
               </Link>
             </div>
           ))}

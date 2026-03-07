@@ -1,8 +1,13 @@
+'use client';
+
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Download } from 'lucide-react';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 export default function PressPage() {
+  const stats = useQuery(api.reports.dashboardStats);
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
       <div
@@ -25,7 +30,8 @@ export default function PressPage() {
             TI-Kenya Campaign Finance Watch Tool Hackathon.
           </p>
           <p className="text-[var(--text-secondary)]">
-            Key stats: 1,247 total reports, 312 verified, 47 counties covered.
+            Key stats: {stats?.total ?? '—'} total reports, {stats?.byStatus?.verified ?? '—'} verified
+            {stats?.topCounties?.length ? `, ${stats.topCounties.length} counties in top list.` : '.'}
           </p>
         </Card>
 
@@ -35,12 +41,14 @@ export default function PressPage() {
             Export CSV, PDF summary, and key charts. Apply date range and
             category filters.
           </p>
-          <button
-            className="flex items-center gap-2 px-6 py-3 bg-[var(--accent-1)] text-white font-bold rounded-lg"
+          <a
+            href="/api/press-kit"
+            download="press-kit.txt"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent-1)] text-white font-bold rounded-lg"
             aria-label="Download press kit"
           >
             <Download className="w-4 h-4" /> Download Press Kit
-          </button>
+          </a>
         </Card>
 
         <Card>

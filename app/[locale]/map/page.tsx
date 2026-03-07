@@ -1,16 +1,36 @@
 'use client';
 
 import { useState } from 'react';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import { MapView } from '@/components/map/MapView';
 import { Card } from '@/components/ui/Card';
 
-const categories = ['All', 'Vote buying', 'Illegal donations', 'Misuse', 'Undeclared', 'Bribery', 'Other'];
-const statuses = ['All', 'Verified', 'Under review', 'Unverified'];
+const categories = [
+  { value: '', label: 'All' },
+  { value: 'vote-buying', label: 'Vote buying' },
+  { value: 'illegal-donations', label: 'Illegal donations' },
+  { value: 'misuse-public-resources', label: 'Misuse' },
+  { value: 'undeclared-spending', label: 'Undeclared' },
+  { value: 'bribery', label: 'Bribery' },
+  { value: 'other', label: 'Other' },
+];
+const statuses = [
+  { value: '', label: 'All' },
+  { value: 'verified', label: 'Verified' },
+  { value: 'under_review', label: 'Under review' },
+  { value: 'unverified', label: 'Unverified' },
+];
 
 export default function MapPage() {
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
   const [viewMode, setViewMode] = useState<'markers' | 'heat'>('markers');
+
+  const reports = useQuery(api.reports.listForMap, {
+    category: selectedCategory || undefined,
+    status: selectedStatus || undefined,
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
@@ -38,7 +58,7 @@ export default function MapPage() {
                     className="w-full px-4 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)]"
                   >
                     {categories.map((c) => (
-                      <option key={c} value={c}>{c}</option>
+                      <option key={c.value || 'all'} value={c.value}>{c.label}</option>
                     ))}
                   </select>
                 </div>
@@ -50,7 +70,7 @@ export default function MapPage() {
                     className="w-full px-4 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)]"
                   >
                     {statuses.map((s) => (
-                      <option key={s} value={s}>{s}</option>
+                      <option key={s.value || 'all'} value={s.value}>{s.label}</option>
                     ))}
                   </select>
                 </div>
@@ -83,7 +103,7 @@ export default function MapPage() {
             </Card>
           </div>
           <div className="lg:col-span-3">
-            <MapView />
+            <MapView reports={reports ?? []} />
             {viewMode === 'heat' && (
               <p className="mt-2 text-sm text-[var(--text-secondary)]">
                 Heat map view coming soon. Currently showing markers.

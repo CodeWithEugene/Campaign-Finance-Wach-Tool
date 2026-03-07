@@ -1,22 +1,23 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Search } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { MobileNav } from './MobileNav';
+import { getMessage } from '@/lib/i18n';
 
-const navLinks = [
-  { href: '/learn', label: 'Learn' },
-  { href: '/report', label: 'Report' },
-  { href: '/mchango', label: 'Mchango' },
-  { href: '/map', label: 'Map' },
-  { href: '/dashboard', label: 'Dashboard' },
-  { href: '/reports', label: 'Reports' },
-  { href: '/transparency', label: 'Transparency' },
-  { href: '/calculator', label: 'Calculator' },
+const navLinkKeys = [
+  { href: '/learn', key: 'nav.learn' },
+  { href: '/report', key: 'nav.report' },
+  { href: '/mchango', key: 'nav.mchango' },
+  { href: '/map', key: 'nav.map' },
+  { href: '/dashboard', key: 'nav.dashboard' },
+  { href: '/reports', key: 'nav.reports' },
+  { href: '/transparency', key: 'nav.transparency' },
+  { href: '/calculator', key: 'nav.calculator' },
 ];
 
 function getLocalizedHref(href: string, pathname: string | null): string {
@@ -26,7 +27,17 @@ function getLocalizedHref(href: string, pathname: string | null): string {
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+  const locale = pathname?.split('/')[1] || 'en';
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/${locale}/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
     <header
@@ -36,17 +47,39 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           <Link
-            href={pathname ? `/${pathname.split('/')[1] || 'en'}` : '/en'}
+            href={`/${locale}`}
             className="font-display font-black text-xl lg:text-2xl text-[var(--accent-1)] hover:text-[var(--accent-2)] transition-colors"
           >
-            Campaign Finance Watch
+            CFWT
           </Link>
+
+          <form
+            onSubmit={handleSearch}
+            className="hidden md:flex flex-1 max-w-xs mx-4"
+            role="search"
+          >
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={getMessage(locale, 'search.placeholder')}
+              className="w-full px-3 py-2 rounded-l-lg border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
+              aria-label="Search reports"
+            />
+            <button
+              type="submit"
+              className="px-3 py-2 rounded-r-lg bg-[var(--accent-1)] text-white"
+              aria-label="Submit search"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+          </form>
 
           <nav
             className="hidden lg:flex items-center gap-1"
             aria-label="Main navigation"
           >
-            {navLinks.map((link) => (
+            {navLinkKeys.map((link) => (
               <Link
                 key={link.href}
                 href={getLocalizedHref(link.href, pathname)}
@@ -56,7 +89,7 @@ export function Header() {
                     : 'text-[var(--text-primary)] hover:bg-[var(--bg-primary)]'
                 }`}
               >
-                {link.label}
+                {getMessage(locale, link.key)}
               </Link>
             ))}
           </nav>
@@ -77,7 +110,10 @@ export function Header() {
       </div>
 
       <MobileNav
-        links={navLinks.map((l) => ({ ...l, href: getLocalizedHref(l.href, pathname) }))}
+        links={navLinkKeys.map((l) => ({
+          href: getLocalizedHref(l.href, pathname),
+          label: getMessage(locale, l.key),
+        }))}
         isOpen={mobileOpen}
         onClose={() => setMobileOpen(false)}
       />

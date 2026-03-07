@@ -47,6 +47,8 @@ See [FEATURES.md](./FEATURES.md) for the full specification.
 ## Tech Stack
 
 - **Framework:** Next.js (Vercel)
+- **Database & backend:** Convex
+- **Auth:** NextAuth (Credentials for admin)
 - **Payments:** Paystack
 - **USSD/SMS:** Africa's Talking
 - **Deployment:** Vercel
@@ -78,15 +80,35 @@ cp .env.example .env
 
 | Variable | Description |
 |----------|-------------|
+| `NEXT_PUBLIC_CONVEX_URL` | Convex deployment URL (from [Convex Dashboard](https://dashboard.convex.dev) or after `npx convex dev`) |
 | `PAYSTACK_SECRET_KEY` | Paystack secret key |
 | `PAYSTACK_PUBLIC_KEY` | Paystack public key |
+| `NEXTAUTH_URL` | App URL (e.g. `http://localhost:3000`) |
+| `NEXTAUTH_SECRET` | Random string (e.g. `openssl rand -base64 32`) |
+| `ADMIN_EMAIL` | Admin login email |
+| `ADMIN_PASSWORD_HASH` | bcrypt hash of admin password: `node -e "console.log(require('bcryptjs').hashSync('YOUR_PASSWORD', 10))"` |
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for Africa's Talking and other optional variables.
+
+### Convex setup
+
+1. Run Convex dev to create/link a project and generate types:
+   ```bash
+   npx convex dev
+   ```
+2. Set `NEXT_PUBLIC_CONVEX_URL` in `.env` (the URL printed by `convex dev` or from the [Convex Dashboard](https://dashboard.convex.dev)).
+3. Seed parties (Mchango dropdown): from the Convex Dashboard run the `parties:seed` mutation once, or call it from the app when the parties list is empty.
 
 ### Run Locally
 
 ```bash
 npm run dev
+```
+
+In another terminal, keep Convex in sync:
+
+```bash
+npx convex dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).

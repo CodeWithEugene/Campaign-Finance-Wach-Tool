@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import type { MapReport } from './MapComponent';
 
 const MapComponent = dynamic(() => import('./MapComponent'), {
   ssr: false,
@@ -12,7 +13,7 @@ const MapComponent = dynamic(() => import('./MapComponent'), {
   ),
 });
 
-export function MapView() {
+export function MapView({ reports = [] }: { reports?: MapReport[] }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -27,5 +28,5 @@ export function MapView() {
     );
   }
 
-  return <MapComponent />;
+  return <MapComponent reports={reports} />;
 }
