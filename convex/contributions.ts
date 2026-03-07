@@ -96,3 +96,33 @@ export const totalsByParty = query({
     return byParty;
   },
 });
+
+const PARTIES = [
+  { partyId: 'uda', partyName: 'United Democratic Alliance' },
+  { partyId: 'odm', partyName: 'Orange Democratic Movement' },
+  { partyId: 'jubilee', partyName: 'Jubilee Party' },
+];
+
+/** Seed dummy successful contributions for Mchango/transparency pages. Run: npx convex run contributions:seedDummyData */
+export const seedDummyData = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    const amounts = [500, 1000, 2000, 5000, 10000, 25000, 50000, 100000]; // KES
+    let count = 0;
+    for (let i = 0; i < 36; i++) {
+      const party = PARTIES[i % PARTIES.length];
+      await ctx.db.insert('contributions', {
+        amount: amounts[i % amounts.length],
+        partyId: party.partyId,
+        partyName: party.partyName,
+        status: 'success',
+        email: i % 3 === 0 ? 'eugenegabriel.ke@gmail.com' : undefined,
+        createdAt: now - (i * 1000 * 60 * 60 * 24),
+        updatedAt: now - (i * 1000 * 60 * 60 * 24),
+      });
+      count++;
+    }
+    return { ok: true, count, message: `Inserted ${count} dummy contributions.` };
+  },
+});

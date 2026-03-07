@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import type { ReportCategory, ReportStatus } from '@/convex/schema';
@@ -18,12 +19,16 @@ const categories = [
 ];
 const statuses = [
   { value: '', label: 'All' },
-  { value: 'verified', label: 'Verified' },
+  { value: 'submitted', label: 'Submitted' },
   { value: 'under_review', label: 'Under review' },
+  { value: 'verified', label: 'Verified' },
   { value: 'unverified', label: 'Unverified' },
+  { value: 'needs_more_info', label: 'Needs more info' },
 ];
 
 export default function MapPage() {
+  const pathname = usePathname();
+  const locale = pathname?.split('/')[1] || 'en';
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [viewMode, setViewMode] = useState<'markers' | 'heat'>('markers');
@@ -104,7 +109,7 @@ export default function MapPage() {
             </Card>
           </div>
           <div className="lg:col-span-3">
-            <MapView reports={reports ?? []} />
+            <MapView reports={reports ?? []} locale={locale} />
             {viewMode === 'heat' && (
               <p className="mt-2 text-sm text-[var(--text-secondary)]">
                 Heat map view coming soon. Currently showing markers.

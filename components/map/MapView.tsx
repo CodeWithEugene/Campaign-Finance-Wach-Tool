@@ -13,7 +13,7 @@ const MapComponent = dynamic(() => import('./MapComponent'), {
   ),
 });
 
-export function MapView({ reports = [] }: { reports?: MapReport[] }) {
+export function MapView({ reports = [], locale = 'en' }: { reports?: MapReport[]; locale?: string }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -28,5 +28,5 @@ export function MapView({ reports = [] }: { reports?: MapReport[] }) {
     );
   }
 
-  return <MapComponent reports={reports} />;
+  return <MapComponent reports={reports} locale={locale} />;
 }

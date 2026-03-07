@@ -1,6 +1,7 @@
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
 import { reportCategoryValidator, reportStatusValidator } from './schema';
+import type { ReportCategory, ReportStatus } from './schema';
 
 export const list = query({
   args: {
@@ -161,15 +162,27 @@ export const listForMap = query({
     category: v.optional(reportCategoryValidator),
   },
   handler: async (ctx, args) => {
-    const q = args.status
-      ? ctx.db.query('reports').withIndex('by_status', (e) => e.eq('status', args.status!))
+    // Support both filters: use one index, then filter by the other in memory if needed.
+    let reports = await (args.status
+      ? ctx.db
+          .query('reports')
+          .withIndex('by_status', (e) => e.eq('status', args.status!))
+          .order('desc')
+          .take(500)
       : args.category
-        ? ctx.db.query('reports').withIndex('by_category', (e) => e.eq('category', args.category!))
-        : ctx.db.query('reports').withIndex('by_created');
-    const reports = await q.order('desc').take(500);
-    // latitude/longitude are not yet stored in the schema — return only available fields.
-    // When geo-coding is implemented, add `latitude` and `longitude` to the reports table
-    // and include them here.
+        ? ctx.db
+            .query('reports')
+            .withIndex('by_category', (e) => e.eq('category', args.category!))
+            .order('desc')
+            .take(500)
+        : ctx.db
+            .query('reports')
+            .withIndex('by_created')
+            .order('desc')
+            .take(500));
+    if (args.status && args.category) {
+      reports = reports.filter((r) => r.category === args.category);
+    }
     return reports.map((r) => ({
       _id: r._id,
       title: r.title,
@@ -222,5 +235,60 @@ export const dashboardStats = query({
           createdAt: r.createdAt,
         })),
     };
+  },
+});
+
+/** Kenyan counties that have coordinates in lib/countyCoords (for map markers). */
+const MAP_COUNTIES = [
+  'Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Kiambu', 'Kakamega', 'Meru',
+  'Kisii', 'Kericho', 'Nyeri', 'Machakos', 'Garissa', 'Lamu', 'Bungoma', 'Embu',
+  'Kilifi', 'Narok', 'Kajiado', 'Bomet', 'Siaya', 'Migori', 'Homa Bay', 'Vihiga',
+  'Uasin Gishu', 'Trans Nzoia', 'Laikipia', 'Thika',
+];
+
+const DUMMY_CATEGORIES: ReportCategory[] = [
+  'vote-buying', 'illegal-donations', 'misuse-public-resources',
+  'undeclared-spending', 'bribery', 'other',
+];
+
+const DUMMY_STATUSES: ReportStatus[] = [
+  'submitted', 'under_review', 'verified', 'unverified', 'needs_more_info',
+];
+
+const DUMMY_TITLES = [
+  'Cash handouts at rally', 'Unregistered campaign donations', 'Government vehicle used for campaign',
+  'Undeclared spending at event', 'Bribery allegation at polling station', 'Other campaign finance concern',
+  'Vote buying in market area', 'Donations from unnamed source', 'Public funds diverted to campaign',
+  'Spending above declared limit', 'Officials offered inducements', 'Alleged misuse of party funds',
+];
+
+/**
+ * Seed dummy reports for the interactive map. Run once: npx convex run reports:seedMapDummyData
+ * Spreads reports across categories, statuses, and Kenyan counties so filters and markers work.
+ */
+export const seedMapDummyData = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    const inserted: string[] = [];
+    for (let i = 0; i < 80; i++) {
+      const category = DUMMY_CATEGORIES[i % DUMMY_CATEGORIES.length];
+      const status = DUMMY_STATUSES[i % DUMMY_STATUSES.length];
+      const county = MAP_COUNTIES[i % MAP_COUNTIES.length];
+      const title = DUMMY_TITLES[i % DUMMY_TITLES.length] + ` (${county})`;
+      await ctx.db.insert('reports', {
+        title,
+        description: `Dummy report for map demo. Active campaign activity reported in ${county}.`,
+        category,
+        location: county,
+        county,
+        anonymous: true,
+        status,
+        createdAt: now - (i * 1000 * 60 * 60 * 24),
+        updatedAt: now - (i * 1000 * 60 * 60 * 24),
+      });
+      inserted.push(title);
+    }
+    return { ok: true, count: inserted.length, message: `Inserted ${inserted.length} dummy map reports.` };
   },
 });
