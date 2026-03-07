@@ -143,7 +143,6 @@ For each incident, extract:
 - location: Kenya county/city
 - amount: Exact KES amount as number (e.g., 5000000 for 5 million)
 - confidence: verified (official records), reported (news), alleged (unconfirmed)
-- sourceUrl: Actual URL to news article, social media post, or official document if available (e.g., Nation.africa, StandardMedia.co.ke, TikTok, Instagram, Twitter/X, YouTube, Parliament.go.ke, IEBC.or.ke). If no specific URL, leave empty.
 
 Return maximum 15 most significant incidents.
 Return ONLY valid JSON array, no other text.
@@ -166,7 +165,7 @@ Return ONLY valid JSON array, no other text.
       source: 'Public Records',
       headline: activity.headline || '',
       summary: activity.summary || '',
-      sourceUrl: activity.sourceUrl || `https://www.google.com/search?q=${encodeURIComponent(personName + ' ' + activity.headline)}`,
+      sourceUrl: `https://www.google.com/search?q=${encodeURIComponent(personName + ' ' + activity.headline + ' Kenya')}`,
       publishedAt: activity.date !== 'unknown' 
         ? new Date(activity.date) 
         : new Date(),
