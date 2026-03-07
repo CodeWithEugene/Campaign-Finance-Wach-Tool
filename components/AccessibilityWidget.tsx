@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { Accessibility } from 'lucide-react';
 
 const STORAGE_KEYS = {
   highContrast: 'accessibility-high-contrast',
@@ -113,16 +114,7 @@ function applyPreferences(prefs: {
 }
 
 function AccessibilityButtonIcon({ className }: { className?: string }) {
-  return (
-    <img
-      src="/images/accessibility/accessibility-icon.png"
-      alt=""
-      className={className}
-      width={28}
-      height={28}
-      aria-hidden
-    />
-  );
+  return <Accessibility className={className} size={36} aria-hidden />;
 }
 
 export function AccessibilityWidget() {

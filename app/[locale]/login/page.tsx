@@ -5,13 +5,14 @@ import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
+import { getSafeCallbackUrl } from '@/lib/authRedirect';
 
 function LoginForm() {
   const pathname = usePathname();
   const locale = pathname?.split('/')[1] || 'en';
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || `/${locale}`;
+  const callbackUrl = getSafeCallbackUrl(searchParams.get('callbackUrl'), locale);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,13 +23,22 @@ function LoginForm() {
     setError('');
     setLoading(true);
     const res = await signIn('credentials', { email, password, redirect: false });
-    setLoading(false);
     if (res?.error) {
-      setError('Invalid email or password.');
+      setLoading(false);
+      const isConfigError =
+        res.error === 'Configuration' ||
+        res.error?.toLowerCase().includes('configuration') ||
+        res.url?.includes('error=Configuration');
+      setError(
+        isConfigError
+          ? 'Sign-in is temporarily unavailable. Please try again later or contact support.'
+          : 'Invalid email or password.'
+      );
       return;
     }
-    router.push(callbackUrl);
+    await router.push(callbackUrl);
     router.refresh();
+    setLoading(false);
   }
 
   return (

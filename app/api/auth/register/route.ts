@@ -29,8 +29,8 @@ export async function POST(request: Request) {
     const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
     if (!convexUrl) {
       return NextResponse.json(
-        { error: 'Server configuration error' },
-        { status: 500 }
+        { error: 'Sign up is temporarily unavailable. Please try again later.' },
+        { status: 503 }
       );
     }
 

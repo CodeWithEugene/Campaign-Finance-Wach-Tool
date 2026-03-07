@@ -6,13 +6,14 @@ import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { validatePassword } from '@/lib/password';
+import { getSafeCallbackUrl } from '@/lib/authRedirect';
 
 function SignupForm() {
   const pathname = usePathname();
   const locale = pathname?.split('/')[1] || 'en';
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || `/${locale}`;
+  const callbackUrl = getSafeCallbackUrl(searchParams.get('callbackUrl'), locale);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -47,10 +48,11 @@ function SignupForm() {
         setLoading(false);
         return;
       }
-      router.push(callbackUrl);
+      await router.push(callbackUrl);
       router.refresh();
     } catch {
       setError('Something went wrong. Please try again.');
+    } finally {
       setLoading(false);
     }
   }
