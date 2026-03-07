@@ -17,6 +17,7 @@ import type * as notifications from "../notifications.js";
 import type * as parties from "../parties.js";
 import type * as reports from "../reports.js";
 import type * as users from "../users.js";
+import type * as webhooks from "../webhooks.js";
 
 import type {
   ApiFromModules,
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   parties: typeof parties;
   reports: typeof reports;
   users: typeof users;
+  webhooks: typeof webhooks;
 }>;
 
 /**

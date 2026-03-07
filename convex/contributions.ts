@@ -1,4 +1,4 @@
-import { mutation, query } from './_generated/server';
+import { mutation, query, internalMutation } from './_generated/server';
 import { v } from 'convex/values';
 
 export const list = query({
@@ -42,7 +42,11 @@ export const create = mutation({
   },
 });
 
-export const updateFromWebhook = mutation({
+/**
+ * Internal-only mutation called from the Paystack webhook action.
+ * Made internal so that browser clients cannot directly flip contribution statuses.
+ */
+export const updateFromWebhook = internalMutation({
   args: {
     paystackReference: v.string(),
     status: v.union(v.literal('success'), v.literal('failed'), v.literal('abandoned')),
@@ -74,12 +78,15 @@ export const getByReference = query({
 });
 
 export const totalsByParty = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    // Limit to the most recent successful contributions to avoid unbounded full-table scans
+    const cap = Math.min(args.limit ?? 5000, 10000);
     const all = await ctx.db
       .query('contributions')
       .withIndex('by_status', (q) => q.eq('status', 'success'))
-      .collect();
+      .order('desc')
+      .take(cap);
     const byParty: Record<string, { total: number; count: number }> = {};
     for (const c of all) {
       if (!byParty[c.partyId]) byParty[c.partyId] = { total: 0, count: 0 };

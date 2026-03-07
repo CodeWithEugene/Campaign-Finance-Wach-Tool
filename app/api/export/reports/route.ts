@@ -1,8 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/auth';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/convex/_generated/api';
 
+function sanitizeCsvCell(value: string): string {
+  // Prevent CSV injection: values starting with formula triggers must be quoted and prefixed
+  const dangerous = /^[=+\-@\t\r]/;
+  const escaped = value.replace(/"/g, '""');
+  if (dangerous.test(value)) {
+    return `"'${escaped}"`;
+  }
+  return `"${escaped}"`;
+}
+
 export async function GET(request: NextRequest) {
+  // Require admin authentication
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+  const role = (session.user as { role?: string })?.role;
+  if (role !== 'admin') {
+    return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+  }
+
   const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
   if (!convexUrl) {
     return NextResponse.json({ error: 'Export not configured' }, { status: 503 });
@@ -33,8 +55,17 @@ export async function GET(request: NextRequest) {
     if (format === 'csv') {
       const header = 'id,title,category,location,county,status,createdAt,description\n';
       const rows = reports.map(
-        (r) =>
-          `${r._id},"${(r.title || '').replace(/"/g, '""')}",${r.category},${(r.location || '').replace(/,/g, ';')},${r.county || ''},${r.status},${new Date(r.createdAt).toISOString()},"${(r.description || '').replace(/"/g, '""')}"`
+        (r: { _id: string; title?: string; category: string; location?: string; county?: string; status: string; createdAt: number; description?: string }) =>
+          [
+            r._id,
+            sanitizeCsvCell(r.title || ''),
+            r.category,
+            sanitizeCsvCell(r.location || ''),
+            sanitizeCsvCell(r.county || ''),
+            r.status,
+            new Date(r.createdAt).toISOString(),
+            sanitizeCsvCell(r.description || ''),
+          ].join(',')
       );
       const csv = header + rows.join('\n');
       return new NextResponse(csv, {

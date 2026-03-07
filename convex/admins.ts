@@ -1,7 +1,8 @@
-import { query } from './_generated/server';
+import { internalQuery } from './_generated/server';
 import { v } from 'convex/values';
 
-export const getByEmail = query({
+/** Internal only: get admin by email (used by auth actions only — never exposed to browser). */
+export const getByEmail = internalQuery({
   args: { email: v.string() },
   handler: async (ctx, args) => {
     return await ctx.db

@@ -167,6 +167,9 @@ export const listForMap = query({
         ? ctx.db.query('reports').withIndex('by_category', (e) => e.eq('category', args.category!))
         : ctx.db.query('reports').withIndex('by_created');
     const reports = await q.order('desc').take(500);
+    // latitude/longitude are not yet stored in the schema — return only available fields.
+    // When geo-coding is implemented, add `latitude` and `longitude` to the reports table
+    // and include them here.
     return reports.map((r) => ({
       _id: r._id,
       title: r.title,
@@ -174,8 +177,6 @@ export const listForMap = query({
       location: r.location,
       county: r.county,
       status: r.status,
-      latitude: undefined,
-      longitude: undefined,
     }));
   },
 });
@@ -183,7 +184,9 @@ export const listForMap = query({
 export const dashboardStats = query({
   args: {},
   handler: async (ctx) => {
-    const all = await ctx.db.query('reports').collect();
+    // Cap at 5 000 rows to avoid hitting Convex execution-time limits as data grows.
+    // For large deployments, replace with per-status/category aggregate counters.
+    const all = await ctx.db.query('reports').withIndex('by_created').order('desc').take(5000);
     const byStatus: Record<string, number> = {};
     const byCategory: Record<string, number> = {};
     const byCounty: Record<string, number> = {};

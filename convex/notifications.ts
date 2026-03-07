@@ -26,6 +26,9 @@ export const create = mutation({
     link: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    if (!args.userId || args.userId.trim() === '') {
+      throw new Error('userId is required');
+    }
     return await ctx.db.insert('notifications', {
       ...args,
       read: false,
@@ -35,8 +38,14 @@ export const create = mutation({
 });
 
 export const markRead = mutation({
-  args: { id: v.id('notifications') },
+  args: { id: v.id('notifications'), userId: v.string() },
   handler: async (ctx, args) => {
+    const notification = await ctx.db.get(args.id);
+    if (!notification) throw new Error('Notification not found');
+    // Verify the caller owns this notification
+    if (notification.userId !== args.userId) {
+      throw new Error('Not authorized to modify this notification');
+    }
     await ctx.db.patch(args.id, { read: true });
     return args.id;
   },
@@ -45,6 +54,9 @@ export const markRead = mutation({
 export const markAllRead = mutation({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    if (!args.userId || args.userId.trim() === '') {
+      throw new Error('userId is required');
+    }
     const list = await ctx.db
       .query('notifications')
       .withIndex('by_user_unread', (e) =>

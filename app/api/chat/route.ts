@@ -4,6 +4,7 @@ import {
   CHATBOT_GREETING,
   CHATBOT_FALLBACK,
 } from '@/lib/chatbotKnowledge';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 function getResponse(userMessage: string): string {
   const lower = userMessage.toLowerCase().trim();
@@ -22,6 +23,16 @@ function getResponse(userMessage: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate-limit chatbot: max 60 messages per IP per minute
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+  const { allowed } = checkRateLimit(ip, 'chat', { limit: 60, windowMs: 60 * 1000 });
+  if (!allowed) {
+    return NextResponse.json(
+      { content: 'Too many requests. Please slow down.' },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
     const messages = Array.isArray(body.messages) ? body.messages : [];

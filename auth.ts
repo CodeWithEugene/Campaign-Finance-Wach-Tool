@@ -24,8 +24,9 @@ export const authOptions: NextAuthOptions = {
           try {
             const ok = await bcrypt.compare(password, adminHash);
             if (ok) return { id: 'admin', email: adminEmail, name: 'Admin', role: 'admin' };
-          } catch {
-            // Invalid hash format (e.g. plain text in ADMIN_PASSWORD_HASH) — treat as failed login
+          } catch (err) {
+            // Invalid hash format — log for debugging and treat as failed login
+            console.error('[auth] Admin bcrypt compare failed (check ADMIN_PASSWORD_HASH format):', err);
           }
         }
 
@@ -38,8 +39,9 @@ export const authOptions: NextAuthOptions = {
             const client = new ConvexHttpClient(convexUrl);
             const user = await client.action(api.auth.verifyUser, { email, password });
             if (user) return { id: user.id, email: user.email, name: user.name ?? 'User', role: 'user' };
-          } catch {
-            // ignore
+          } catch (err) {
+            // Log the real error so failures can be diagnosed (e.g. network outage, bad Convex URL)
+            console.error('[auth] Convex verifyUser failed:', err);
           }
         }
         return null;
@@ -56,8 +58,12 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  pages: { signIn: '/en/login' },
-  session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 }, // 30 days — stay logged in across pages
+  // signIn page is locale-aware: read from env or fall back to /en/login.
+  // Set NEXTAUTH_SIGNIN_LOCALE in your .env to override (e.g. "sw" for Swahili).
+  pages: {
+    signIn: `/${process.env.NEXTAUTH_SIGNIN_LOCALE ?? 'en'}/login`,
+  },
+  session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 }, // 30 days
 };
 
 export function auth() {
